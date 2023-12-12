@@ -1,0 +1,39 @@
+/* OutputPanel.css */
+/*.output-panel {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    background-color: var(--background-color);
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+    overflow-y: auto;
+    max-height: 300px; /* Adjust the max-height as needed */
+  
+  
+
+  .output-panel {
+    flex-grow: 1; /* Allows the panel to grow and fill the space */
+    overflow-y: auto; /* Allows scrolling if content overflows */
+    padding: 10px;
+    background-color: var(--background-color);
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px; /* You might want to adjust or remove this */
+    /* Removed max-height to allow dynamic growth */
+}
+  
+  .output-panel code {
+    display: block;
+    background-color: var(--secondary-bg-color);
+    color: var(--primary-text-color);
+    padding: 10px 20px;
+    margin: 10px 0;
+    border-radius: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  
+  /* Add additional styles as needed */
+  

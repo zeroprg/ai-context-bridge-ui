@@ -1,3 +1,87 @@
+/* App.css */
+
+.body {
+  background-color: flex;
+  display: flex
+}
+.theme-toggle-button {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  z-index: 1000; /* Ensure it's above other elements */
+}
+
+.theme-toggle-button:hover {
+  background-color: var(--primary-color-hover);
+}
+
+/* Root variables for light theme */
+[data-theme="light"] {
+  --primary-text-color: #333;
+  --background-color: #FAFAFA;
+  --primary-color-hover: #5a8dbb; /* Adjust as needed */
+  --primary-color: #4a76a8; /* Add your primary color here */
+  --app-header-bg-color: #f6f8fd; /* Light theme background for App-header */
+  /*  message bar*/
+  --secondary-bg-color: #4a76a8; /* Light theme secondary background */
+  --icon-color: #FFF; /* Light theme icon color */
+  --input-bg-color: #FFF; /* Light theme input background color */
+
+  /* ... other light theme variables ... */
+}
+
+/* Dark theme variables */
+[data-theme="dark"] {
+  --primary-text-color: #FFF;
+  --background-color: #1A1A1A;
+  --primary-color-hover: #4b6a82; /* Adjust as needed */
+  --primary-color: #3674a2; /* Adjust primary color for dark theme if needed */
+  --app-header-bg-color: #20232a; /* Dark theme background for App-header */
+/*  message bar*/
+  --secondary-bg-color: #20232a; /* Dark theme secondary background */
+  --icon-color: #61dafb; /* Dark theme icon color */
+  --input-bg-color: #333; /* Dark theme input background color */
+
+
+  /* ... other dark theme variables ... */
+}
+
+/* General Body Styles */
+body {
+  background-color: var(--background-color);
+  color: var(--primary-text-color);
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+
+/* Typography */
+h1, h2, h3 {
+  margin: 0;
+  padding: 0.5em 0;
+  color: var(--primary-color);
+}
+
+/* Utility Classes */
+.text-center {
+  text-align: center;
+}
+
+/* Common Component Styles */
+.button {
+  background-color: var(--primary-color);
+  color: white;
+  /* ... other button styles ... */
+}
+
+/* App Specific Styles */
 .App {
   text-align: center;
 }
@@ -5,6 +89,7 @@
 .App-logo {
   height: 40vmin;
   pointer-events: none;
+  animation: App-logo-spin infinite 20s linear;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -13,8 +98,9 @@
   }
 }
 
+/* App-header styles */
 .App-header {
-  background-color: #282c34;
+  background-color: var(--app-header-bg-color); /* Use CSS variable */
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -36,3 +122,17 @@
     transform: rotate(360deg);
   }
 }
+
+.errorDisplay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: red;
+  color: white;
+  text-align: center;
+  padding: 10px 0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.25);
+  z-index: 1000; /* To ensure it's above other elements */
+}
+

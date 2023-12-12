@@ -1,0 +1,41 @@
+/* MessageBar.css */
+.message-bar {
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: var(--secondary-bg-color);
+    border-radius: 20px;
+    color: var(--primary-text-color);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%; /* Set the width to 100% */
+    margin-bottom: 10px; /* Adds a little space below the bar */
+}
+
+.attachment-icon {
+    font-size: 20px;
+    cursor: pointer;
+    margin-right: 10px; /* Space between icon and input */
+    color: var(--icon-color);
+}
+
+.message-input {
+    flex-grow: 1;
+    margin-right: 10px;
+    padding: 5px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    color: var(--primary-text-color);
+    background-color: var(--input-bg-color);
+}
+
+.message-input:focus {
+    outline: none;
+    border: 1px solid var(--primary-color);
+}
+
+.message-icon {
+    font-size: 20px;
+    cursor: pointer;
+    color: var(--icon-color);
+}

@@ -1,0 +1,41 @@
+/* Base styles for DataGrid */
+.DataGrid {
+    width: 100%;
+    font-size: 14px; /* Adjust font size for readability */
+    margin-bottom: 0;
+    padding-bottom: 0;
+    max-height: fit-content;
+}
+
+
+
+/* Styles for header and rows */
+.DataGrid-header,
+.DataGrid-row {
+    height: auto; /* Allow the height to adjust to content */
+    min-height: 30px; /* Minimum height for readability */
+}
+
+/* Column-specific styles for hiding on mobile */
+.column-keyId,
+.column-keyValue {
+    /* Styles specific to keyId and keyValue columns */
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 600px) {
+    .DataGrid {
+        font-size: 12px; /* Smaller font size for mobile devices */
+    }
+
+    .DataGrid-header,
+    .DataGrid-row {
+        height: 40px; /* Smaller height for mobile devices */
+    }
+
+    /* Hide keyId and keyValue columns on smaller screens */
+    .column-keyId,
+    .column-keyValue {
+        display: none;
+    }
+}
