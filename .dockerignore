@@ -1,0 +1,39 @@
+# Node modules
+node_modules
+
+# Build directory
+build
+
+# Git directory
+.git
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Various IDE and editor directories
+.idea
+.vscode
+*.swp
+*.swo
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Dockers files
+Dockerfile
+docker-compose.yml
+docker-build.*
+Readme.md
+
+# Optional: Exclude source files if only the build output is needed
+# src/

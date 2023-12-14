@@ -5,13 +5,13 @@ FROM node:18.16.0 as build
 WORKDIR /app
 
 # Copy package.json and package-lock.json (or yarn.lock) files
-COPY ai-contexts-bridge-ui/package*.json ./
+COPY ./package*.json ./
 
 # Install dependencies
 RUN npm install
 
 # Copy the rest of the application's code
-COPY ai-contexts-bridge-ui/ ./
+COPY ./ ./
 
 # Build the application
 RUN npm run build
