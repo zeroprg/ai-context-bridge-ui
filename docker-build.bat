@@ -9,6 +9,6 @@ FOR /F "tokens=*" %%i IN (.env) DO (
     )
 )
 
-docker build !args! -t  ai-context-bridge-ui .
+docker build !args! -t ai-context-bridge-ui .
 
 ENDLOCAL
