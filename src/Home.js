@@ -17,14 +17,8 @@ const Home = ({ initiateGoogleOAuth }) => {
     };
 
     /* Authentication and navigation*/
-    const navigate = useNavigate();
-    const [sessionId, setSessionId] = useState(getCookie('sessionId'));  
+    const navigate = useNavigate();    
 
-    
-    useEffect(() => {
- 
-        setSessionId( getCookie('sessionId'));
-    }, [sessionId]);
 
     const handleRunButtonClick = () => {
         navigate('/api');
@@ -41,7 +35,7 @@ const Home = ({ initiateGoogleOAuth }) => {
                     </button>
                 </div>
                 <div>
-                    {!sessionId ? (
+                    {getCookie('sessionId')? (
                         <button className="google-login-button" onClick={handleRunButtonClick}>Run</button>
                     ) : (
                         <button className="google-login-button" onClick={initiateGoogleOAuth}>

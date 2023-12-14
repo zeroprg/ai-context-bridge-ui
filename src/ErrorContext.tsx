@@ -20,13 +20,13 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
     setError(errorMessage);
     setTimeout(() => setError(null), 5000);
 
-    if (errorObject && isCorsError(errorObject)) {
+    if (errorObject && isConnectionError(errorObject)) {
       setCookie('sessionId', '', -1);
     }
   };
 
-  const isCorsError = (errorObject: any) => {
-    return errorObject.message.includes('CORS') || (errorObject.response && errorObject.response.status === 0);
+  const isConnectionError = (errorObject: any) => {
+    return errorObject.code === 'ERR_NETWORK' || (errorObject.response && errorObject.response.status === 0);
   };
 
   return (
