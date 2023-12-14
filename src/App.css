@@ -107,7 +107,7 @@ h1, h2, h3 {
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: white;
+  color: var(--primary-text-color);
 }
 
 .App-link {
