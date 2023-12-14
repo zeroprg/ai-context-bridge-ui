@@ -1,9 +1,11 @@
 // App.js
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './Home';
 import API from './API';
 import './App.css';
 import { BACKEND_REDIRECT_URI, CLIENT_ID } from './apiConstants';
+import {UserProviderComponent} from './components/UserContext';
 
 const App = () => {
     const initiateGoogleOAuth = () => {
@@ -21,13 +23,17 @@ const App = () => {
     };
 
     return (
+        <React.StrictMode>
         <Router>
             <Routes>
-                <Route path="/api" element={<API />} />
-                <Route path="/" element={<Home initiateGoogleOAuth={initiateGoogleOAuth} />} />
+              
+                <Route path="/api" element={<UserProviderComponent> <API /> </UserProviderComponent>} />
+                <Route path="/" element={ <Home initiateGoogleOAuth={initiateGoogleOAuth} /> } />
                 {/* Add other routes as needed */}
+              
             </Routes>
         </Router>
+        </React.StrictMode>
     );
 };
 

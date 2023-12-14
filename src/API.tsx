@@ -6,17 +6,18 @@ import { ApiKey } from './models/ApiKey';
 import './API.css';
 import APIKeyGrid from './APIKeyGrid';
 import { API_URLS } from './apiConstants';
-import { getToken } from './auth';
 import MessageBar from './components/MessageBar';
 import OutputPanel from './components/OutputPanel';
+import { useUser } from './components/UserContext';
 import { useError } from './ErrorContext';
-import { error } from 'console';
 
 
 const API: React.FC = () => {
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
-  const { setError } = useError();
-  const [selectedApiKey, setSelectedApiKey] = useState<string>('');
+  const { user } = useUser();
+  const { handleError } = useError();
+ 
+  const [selectedApiKey, setSelectedApiKey] = useState<string>(user?.recentApiId || '');
   const [queryResult, setQueryResult] = useState<string>('');
   const location = useLocation();
   /* for working with Message Bar */
@@ -29,38 +30,35 @@ const API: React.FC = () => {
       setMessageText(message);
       axios.get(API_URLS.CustomerQuery, {withCredentials: true}).then(response => {
         setQueryResult(JSON.stringify(response.data, null, 2));
-      }).catch(error => {console.error('Error running API:', error); setError('Error running API '+ error.response.data.meessage); });
+      }).catch(error => {console.error('Error running API:', error); handleError('Error running API '+ error.response.data.meessage); });
   };
 
   /* for grabbing API keys */
   useEffect(() => {
-    // Get the token from the cookie
-    const token = getToken();
-    // Set the token as a default header for all axios requests
-    if (token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    }
+    //setSelectedApiKey(user?.recentApiId || '');
     // Fetch the list of API keys on component mount using axios
     console.log(`${API_URLS.GetApiKeys} will be  called`);
     axios.get(API_URLS.GetApiKeys, {withCredentials: true}).then(response => 
           setApiKeys(response.data))
-        .catch(error => { console.error('Error:', error); setError('Error fetching API keys '); setTimeout(() => setError(null), 5000); })
+        .catch(error => {handleError('Error fetching API keys ',error);  })
     }, [location]);
 
   const selectApiKey = async (apiKey: string) => {
     try{     
       const response = await axios.put(API_URLS.SelectAPI(apiKey), null, { withCredentials: true})
-      setSelectedApiKey(apiKey);
+      setSelectedApiKey(apiKey);        
       console.log(response);
     } catch (error) {
       console.error('Error sending message:', error);
+      handleError('Error fetching API keys ',error);
     }
   }; 
 
   const onRowSelected = (selectedRows: ReadonlySet<string>) => {
     // Example implementation: log the selected row keys
     console.log("Selected Rows:", Array.from(selectedRows));
-    selectApiKey(Array.from(selectedRows)[0]);
+    selectApiKey(Array.from(selectedRows)[0]);  
+
   };
 
   return (
@@ -69,6 +67,7 @@ const API: React.FC = () => {
     <div className="api-key-grid-container">
         <APIKeyGrid 
             apiKeys={apiKeys} 
+            keySelectedId={selectedApiKey}
             onRowSelected={onRowSelected}
         />
     </div>

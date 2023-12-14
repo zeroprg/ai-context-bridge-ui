@@ -17,10 +17,7 @@ export const API_URLS = {
     FindUserByName: `${BASE_URL}/user/findByName`,
     AssignRole: `${BASE_URL}/user/assignRole`
 };
-export const GOOGLE_AUTH={
-    CLIENT_ID: process.env.REACT_APP_CLIENT_ID,
-    REDIRECT_URI: process.env.REACT_APP_BACKEND_REDIRECT_URI
-};
-export const CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID
-;
+
+export const CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
 export const BACKEND_REDIRECT_URI = process.env.REACT_APP_BACKEND_REDIRECT_URI;
+ 

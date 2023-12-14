@@ -1,5 +1,5 @@
 import React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import DataGrid ,{ SelectColumn } from 'react-data-grid';
 import { ApiKey } from './models/ApiKey';
 import 'react-data-grid/lib/styles.css'; // or similar path
@@ -7,11 +7,19 @@ import 'react-data-grid/lib/styles.css'; // or similar path
 
 interface APIKeyGridProps {
   apiKeys: ApiKey[];
+  keySelectedId: string; // Assuming you want to track a single selected key ID
   onRowSelected: (selectedRows: ReadonlySet<string>) => void; // Callback for when rows are selected
 }
-const APIKeyGrid: React.FC<APIKeyGridProps> = ({ apiKeys, onRowSelected }) => {
+const APIKeyGrid: React.FC<APIKeyGridProps> = ({ apiKeys, keySelectedId, onRowSelected }) => {
     const [selectedRows, setSelectedRows] = useState<ReadonlySet<string>>(new Set());
- 
+    
+
+    // useEffect to update selectedRows based on keySelectedId prop
+    useEffect(() => {
+      if (keySelectedId) {
+        setSelectedRows(new Set([keySelectedId]));
+      }
+    }, [keySelectedId]);
   const columns = [
     SelectColumn,
 

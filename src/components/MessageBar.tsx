@@ -12,7 +12,7 @@ type MessageBarProps = {
 };
 
 const MessageBar: React.FC<MessageBarProps> = ({ message, onSend }) => {
-    const { setError } = useError();
+    const { handleError } = useError();
     const [messageText, setMessageText] = useState(message);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
@@ -40,8 +40,8 @@ const MessageBar: React.FC<MessageBarProps> = ({ message, onSend }) => {
             setMessageText('');
             setSelectedFile(null);
         } catch (error: any) {
-           console.error('Error sending message:', error);
-           setError(''+ error +' '+  error.response.data.message); setTimeout(() => setError(null), 5000);
+           console.error('Error sending message:', error);          
+           handleError(''+ error +' '+  error.response.data.message, error); 
         }
     };
     

@@ -1,27 +1,37 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState } from 'react';
+import { setCookie } from './auth';
 
-type ErrorContextType = {
+interface ErrorProviderProps {
+  children: React.ReactNode;
+}
+
+interface ErrorContextProps {
   error: string | null;
-  setError: (error: string | null) => void;
-};
+  handleError: (errorMessage: string, errorObject?: any) => void;
+}
 
-const ErrorContext = createContext<ErrorContextType>({
-  error: null,
-  setError: () => {},
-});
+const ErrorContext = createContext<ErrorContextProps>({ error: null, handleError: () => {} });
 
-type ErrorProviderProps = {
-  children: ReactNode;
-};
+export const useError = () => useContext(ErrorContext);
 
 export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
   const [error, setError] = useState<string | null>(null);
+    const handleError = (errorMessage: string, errorObject?: any) => {
+    setError(errorMessage);
+    setTimeout(() => setError(null), 5000);
+
+    if (errorObject && isCorsError(errorObject)) {
+      setCookie('sessionId', '', -1);
+    }
+  };
+
+  const isCorsError = (errorObject: any) => {
+    return errorObject.message.includes('CORS') || (errorObject.response && errorObject.response.status === 0);
+  };
 
   return (
-    <ErrorContext.Provider value={{ error, setError }}>
+    <ErrorContext.Provider value={{ error, handleError }}>
       {children}
     </ErrorContext.Provider>
   );
 };
-
-export const useError = () => useContext(ErrorContext);

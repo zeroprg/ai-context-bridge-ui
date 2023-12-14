@@ -1,4 +1,6 @@
 // auth.ts
+
+
 let token: string | null = null;
 
 export const setToken = (newToken: string): void => {
@@ -20,7 +22,7 @@ export const getCookie = (name: string): string | null => {
     return null;
 };
 
-const setCookie = (name: string, value: string, days: number): void => {
+export const setCookie = (name: string, value: string, days: number): void => {
     let expires = "";
     if (days) {
         const date = new Date();
@@ -30,7 +32,7 @@ const setCookie = (name: string, value: string, days: number): void => {
     document.cookie = `${name}=${value}${expires}; path=/`;
 };
 
-const setJSESSIONID = (): void => {
+export const setJSESSIONID = (): void => {
     const sessionId = getCookie('sessionId');
     if (sessionId) {
         // Set the sessionId as JSESSIONID for further requests
@@ -38,5 +40,4 @@ const setJSESSIONID = (): void => {
     }
 };
 
-// Call setJSESSIONID once to initialize JSESSIONID cookie
 setJSESSIONID();
