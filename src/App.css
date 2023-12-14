@@ -136,3 +136,21 @@ h1, h2, h3 {
   z-index: 1000; /* To ensure it's above other elements */
 }
 
+.nice-link {
+  color: #007bff;
+  background-color: transparent;
+  text-decoration: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  border: 2px solid #007bff;
+  transition: all 0.3s ease-in-out;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  display: inline-block;
+  margin: 10px 5px;
+  text-align: center;
+}
+.nice-link:hover {
+  background-color: #0056b3;
+}

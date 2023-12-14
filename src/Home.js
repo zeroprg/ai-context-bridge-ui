@@ -1,7 +1,9 @@
 // Home.js
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import { getCookie } from './auth';
+import { Footer } from './content/components';
 
 const Home = ({ initiateGoogleOAuth }) => {
     /* Theme toggling */
@@ -19,16 +21,25 @@ const Home = ({ initiateGoogleOAuth }) => {
     /* Authentication and navigation*/
     const navigate = useNavigate();    
 
+    const aboutLink = process.env.REACT_APP_DEV_DOC_SITE || 'http://tothemoon.chat';
 
     const handleRunButtonClick = () => {
         navigate('/api');
     };
 
     return (
-        <div className="App">
+        
+        <main className="App">
             <header className="App-header">
                 <h1>Welcome to ToTheMoon Chat</h1>
+                
+                <img src="/logo512.png" alt="Logo" />
                 <p>Your enterprise solution for document processing and analysis...</p>
+                <p>
+                    Working with *.doc,*.pdf,*.wml,*.wave, etc...      
+                    <a href={aboutLink} target="_blank" rel="noopener noreferrer" className="about-link"> Reference to technical details</a>
+                </p>
+
                 <div>
                     <button className="theme-toggle-button" onClick={toggleTheme}>
                         {theme === 'light' ? 'Dark' : 'Light'} Mode
@@ -44,7 +55,8 @@ const Home = ({ initiateGoogleOAuth }) => {
                     )}
                 </div>
             </header>
-        </div>
+            <Footer />
+        </main>
     );
 };
 
