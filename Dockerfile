@@ -29,13 +29,13 @@ FROM nginx:alpine
 COPY --from=build /app/build /usr/share/nginx/html
 
 
-# Copy your custom Nginx configuration file SSL confihuration
-COPY ssl_nginx.conf /etc/nginx/conf.d/default.conf
+# Copy your custom Nginx configuration file SSL confihuration to nginx or use volume in run command
+#COPY ssl_nginx.conf /etc/nginx/conf.d/default.conf
 # Copy SSL certificates
 #Certificate is saved at: 
-COPY /etc/letsencrypt/live/tothemoon.chat/fullchain.pem /etc/nginx/ssl/fullchain.pem
+#COPY /etc/letsencrypt/live/tothemoon.chat/fullchain.pem /etc/nginx/ssl/fullchain.pem
 #Key is saved at:         
-COPY /etc/letsencrypt/live/tothemoon.chat/privkey.pem /etc/nginx/ssl/privkey.pem
+#COPY /etc/letsencrypt/live/tothemoon.chat/privkey.pem /etc/nginx/ssl/privkey.pem
 
 
 # Expose port 80 , 443 for SSL
