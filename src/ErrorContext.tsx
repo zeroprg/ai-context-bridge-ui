@@ -26,7 +26,7 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
   };
 
   const isConnectionError = (errorObject: any) => {
-    return errorObject.code === 'ERR_NETWORK' || (errorObject.response && errorObject.response.status === 0);
+    return errorObject.code === 'ERR_NETWORK' || errorObject.code === 'CORS_ERROR';
   };
 
   return (

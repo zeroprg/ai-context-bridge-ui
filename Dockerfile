@@ -28,8 +28,18 @@ FROM nginx:alpine
 # Copy the build output to replace the default nginx contents.
 COPY --from=build /app/build /usr/share/nginx/html
 
-# Expose port 80
-EXPOSE 80
+
+# Copy your custom Nginx configuration file SSL confihuration
+COPY ssl_nginx.conf /etc/nginx/conf.d/default.conf
+# Copy SSL certificates
+#Certificate is saved at: 
+COPY /etc/letsencrypt/live/tothemoon.chat/fullchain.pem /etc/nginx/ssl/fullchain.pem
+#Key is saved at:         
+COPY /etc/letsencrypt/live/tothemoon.chat/privkey.pem /etc/nginx/ssl/privkey.pem
+
+
+# Expose port 80 , 443 for SSL
+EXPOSE 80 443
 
 # Start Nginx and keep it running
 CMD ["nginx", "-g", "daemon off;"]
