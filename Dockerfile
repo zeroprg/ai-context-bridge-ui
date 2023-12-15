@@ -4,6 +4,12 @@ FROM node:18.16.0 as build
 # Set working directory in the container
 WORKDIR /app
 
+# Define build argument for environment
+ARG REACT_APP_ENV
+
+# Set NODE_ENV environment variable
+ENV NODE_ENV=$REACT_APP_ENV
+
 # Copy package.json and package-lock.json (or yarn.lock) files
 COPY ./package*.json ./
 
