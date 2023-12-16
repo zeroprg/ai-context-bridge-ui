@@ -28,8 +28,8 @@ FROM nginx:alpine
 # Copy the build output to replace the default nginx contents.
 COPY --from=build /app/build /usr/share/nginx/html
 
-# Expose port 3000 will be mapped by nginx to  outside port 80
-EXPOSE 3000
+# Expose port 80 will be mapped by Docker run to  outside port 81
+EXPOSE 80
 
 # Start Nginx and keep it running
 CMD ["nginx", "-g", "daemon off;"]
