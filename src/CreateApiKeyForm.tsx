@@ -13,7 +13,8 @@ const CreateApiKeyForm: React.FC<CreateApiKeyFormProps> = ({ onCreate }) => {
     uri: '',
     homepage: '',
     userId: '',
-    totalCost: 0.0
+    totalCost: 0.0,
+    publicAccessed: false,
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

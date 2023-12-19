@@ -6,6 +6,6 @@ export interface ApiKey {
     homepage: string;
     userId: string;
     totalCost: number;
+    publicAccessed:boolean;
     // Include other properties if needed
   }
-  

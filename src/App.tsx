@@ -6,6 +6,8 @@ import API from './API';
 import './App.css';
 import { BACKEND_REDIRECT_URI, CLIENT_ID } from './apiConstants';
 import {UserProviderComponent} from './components/UserContext';
+import Layout from './components/Layout';
+import AddAPI from './components/AddAPI';
 
 const App = () => {
     const initiateGoogleOAuth = () => {
@@ -27,8 +29,9 @@ const App = () => {
         <Router>
             <Routes>
               
-                <Route path="/api" element={<UserProviderComponent> <API /> </UserProviderComponent>} />
+                <Route path="/api" element={<UserProviderComponent><Layout> <API /> </Layout></UserProviderComponent>} />
                 <Route path="/" element={ <Home initiateGoogleOAuth={initiateGoogleOAuth} /> } />
+                <Route path="/add-api" element={<UserProviderComponent><Layout> <AddAPI/> </Layout></UserProviderComponent>} />
                 {/* Add other routes as needed */}
               
             </Routes>

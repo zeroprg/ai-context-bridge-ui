@@ -1,0 +1,68 @@
+.add-api-container {
+    padding: 10px;
+    max-width: 500px; /* Limit max width for larger screens */
+    margin: auto;
+  }
+  
+  .api-form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .form-group {
+    display: flex;
+    justify-content: space-between; /* Distributes space between elements */
+    align-items: center; /* Aligns items vertically in the center */
+    margin-bottom: 15px; /* Spacing between form groups */
+  }
+  
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    /* If you want to ensure that inputs take up the remaining space */
+    flex: 1; 
+    margin-left: 10px; /* Spacing between label and input */
+  }
+  
+  
+  .form-group label {
+    margin-right: 10px; /* Spacing between label and input */
+  }
+  
+
+  
+  .form-group input[type="text"],
+  .form-group input[type="number"],
+  .form-group input[type="checkbox"] {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+  }
+  
+  .submit-btn {
+    padding: 10px 15px;
+    background-color: #4a76a8;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .submit-btn:hover {
+    background-color: #3674a2;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 600px) {
+    .add-api-container {
+      padding: 5px;
+    }
+  
+    .form-group input[type="text"],
+    .form-group input[type="number"] {
+      padding: 8px;
+    }
+  }
+  
