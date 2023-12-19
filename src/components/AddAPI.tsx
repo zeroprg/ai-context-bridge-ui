@@ -3,8 +3,11 @@ import React, { useState, FormEvent } from 'react';
 import axios from 'axios';
 import { ApiKey } from '../models/ApiKey';
 import './AddAPI.css'; // Assuming you have a CSS file for styles
+import { useUser } from './UserContext';
+import { API_URLS } from '../apiConstants';
 
 const AddAPI: React.FC = () => {
+  const { user } = useUser();
   const [apiKey, setApiKey] = useState<ApiKey>({
     keyId: '',
     keyValue: '',
@@ -28,7 +31,8 @@ const AddAPI: React.FC = () => {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     // Implement API submission logic here
-    axios.post('/api/add-key', apiKey)
+    //apiKey.userId = user.id;
+    axios.post(API_URLS.CreateApiKey, apiKey)
       .then(response => {
         console.log(response.data);
         // Handle success here (e.g., showing a success message, redirecting, etc.)
@@ -59,7 +63,7 @@ const AddAPI: React.FC = () => {
         </div>
         {/* ... other fields ... */}
         <div className="form-group">
-          <label htmlFor="publicAccessed">Public Accessed:</label>
+          <label htmlFor="publicAccessed">Accessed to public:</label>
           <input type="checkbox" id="publicAccessed" name="publicAccessed" checked={apiKey.publicAccessed} onChange={handleChange} />
         </div>
         <div className="form-group">
@@ -70,11 +74,15 @@ const AddAPI: React.FC = () => {
           <label htmlFor="homepage">Homepage:</label>
           <input id="homepage" name="homepage" value={apiKey.homepage} onChange={handleChange} />
         </div>
+        <input type="hidden" id="userId" name="userId" value={user?.id} />
+
+          {/*
         <div className="form-group">
           <label htmlFor="userId">User ID:</label>
           <input id="userId" name="userId" value={apiKey.userId} onChange={handleChange} />
         </div>
-        {/* ... other fields ... 
+        
+       ... other fields ... 
         <div className="form-group">
           <label htmlFor="totalCost">Total Cost:</label>
           <input type="number" id="totalCost" name="totalCost" value={apiKey.totalCost} onChange={handleChange} />
