@@ -44,7 +44,7 @@
     top: 50%;
     left: 0;
     transform: translateY(-50%);
-    background: var(--background-color); /* Use variable for background color */
+    background: var(--secondary-bg-color); /* Use variable for background color */
     color: var(--primary-text-color); /* Use variable for icon/text color */
     border: none;
     cursor: pointer;
