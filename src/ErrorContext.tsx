@@ -18,7 +18,7 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
   const [error, setError] = useState<string | null>(null);
     const handleError = (errorMessage: string, errorObject?: any) => {
     setError(errorMessage);
-    setTimeout(() => setError(null), 5000);
+    setTimeout(() => setError(null), 10000);
 
     if (errorObject && isConnectionError(errorObject)) {
       setCookie('sessionId', '', -1);

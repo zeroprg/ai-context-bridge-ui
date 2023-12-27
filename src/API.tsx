@@ -3,7 +3,9 @@ import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 
 import { ApiKey } from './models/ApiKey';
+
 import './API.css';
+
 import APIKeyGrid from './APIKeyGrid';
 import { API_URLS } from './apiConstants';
 import MessageBar from './components/MessageBar';
@@ -21,25 +23,38 @@ const API: React.FC = () => {
   const [queryResult, setQueryResult] = useState<string>('');
   const location = useLocation();
   /* for working with Message Bar */
-  const [messageText, setMessageText] = useState(''); // Define the messageText state
+  const [prompt] = useState('');
+  const [logMessage, setlogMessage] = useState('');
 
   // Define a function to handle sending the message
-  const handleSendMessage = (message: string) => {
-      // Implement the logic to send the message, e.g., using Axios
-          // Set the entered message to the state.
-      setMessageText(message);
-      axios.get(API_URLS.CustomerQuery, {withCredentials: true}).then(response => {
-        setQueryResult(JSON.stringify(response.data, null, 2));
-      }).catch(error => {console.error('Error running API:', error); handleError('Error running API '+ error.response.data.meessage); });
+  const handleQueryResult = (message: string) => {
+      // Set the entered message to the state.
+      setQueryResult(message);
   };
+
+  const handleTechnicalMessage = (message: string) => { 
+    /* handle logic to send technical message to OutputPanel  */  
+    setlogMessage(message);
+  }  
+
+  
+
+  useEffect(() => {
+    if (user) {
+      // Update selectedApiKey when user changes from null to not null
+      setSelectedApiKey(user.recentApiId || '');
+    }
+  }, [user]); // Dependency array includes user to trigger effect when user changes
+
 
   /* for grabbing API keys */
   useEffect(() => {
     //setSelectedApiKey(user?.recentApiId || '');
     // Fetch the list of API keys on component mount using axios
-    console.log(`${API_URLS.GetApiKeys} will be  called`);
-    axios.get(API_URLS.GetApiKeys, {withCredentials: true}).then(response => 
-          setApiKeys(response.data))
+    console.log(`${API_URLS.GetApiKeys} will be called`);
+    axios.get(API_URLS.GetApiKeys, {withCredentials: true}).then(response =>{
+            setApiKeys(response.data);
+             })
         .catch(error => {handleError('Error fetching API keys ',error);  })
     }, [location]);
 
@@ -72,8 +87,8 @@ const API: React.FC = () => {
         />
     </div>
     <div className="api-container">
-      <OutputPanel text={queryResult} />         
-      <MessageBar message={messageText} onSend={handleSendMessage} />
+      <OutputPanel message={queryResult} logMessage={logMessage} />         
+      <MessageBar message={prompt} onSend={handleQueryResult} onLogSend={handleTechnicalMessage} />
 
     </div>
 

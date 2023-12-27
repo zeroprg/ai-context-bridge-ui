@@ -4,7 +4,8 @@ import { useNavigate } from 'react-router-dom';
 
 import { getCookie } from './auth';
 import { Footer } from './content/components';
-
+import "./App.css"
+import "./home.css"
 const Home = ({ initiateGoogleOAuth }) => {
     /* Theme toggling */
     const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
@@ -36,7 +37,7 @@ const Home = ({ initiateGoogleOAuth }) => {
                 <img src="/logo512.png" alt="Logo" />
                 <p>Your enterprise solution for document processing and analysis...</p>
                 <p>
-                    Working with *.doc,*.pdf,*.wml,*.wave, etc...      
+                    Working with *.doc,*.pdf,*.wml,*mp3,*.wave, etc...      
                     <a href={aboutLink} target="_blank" rel="noopener noreferrer" className="about-link"> Reference to technical details</a>
                 </p>
 
@@ -49,8 +50,11 @@ const Home = ({ initiateGoogleOAuth }) => {
                     {getCookie('sessionId')? (
                         <button className="google-login-button" onClick={handleRunButtonClick}>Run</button>
                     ) : (
-                        <button className="google-login-button" onClick={initiateGoogleOAuth}>
-                            Login with Google
+                        <button className="google-signin-btn" onClick={initiateGoogleOAuth}>
+                            <div className="google-signin-btn-icon-wrapper">
+                                <img className="google-signin-btn-icon" src="https://developers.google.com/identity/images/g-logo.png" alt="Google sign-in" />
+                            </div>
+                        <span className="google-signin-btn-text">Continue with Google</span>
                         </button>
                     )}
                 </div>

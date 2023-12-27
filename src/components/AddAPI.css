@@ -11,11 +11,20 @@
   
   .form-group {
     display: flex;
+    grid-template-columns: 1fr 2fr; /* 1st column for description, 2nd for value */
+    gap: 10px; /* Space between columns */
     justify-content: space-between; /* Distributes space between elements */
     align-items: center; /* Aligns items vertically in the center */
     margin-bottom: 15px; /* Spacing between form groups */
   }
-  
+
+  .label {
+    text-align: right; /* Align the text to the right for the description */
+    padding-right: 10px; /* Optional spacing */
+}
+
+
+
 
   .form-group input,
   .form-group select,
@@ -65,4 +74,5 @@
       padding: 8px;
     }
   }
+  
   

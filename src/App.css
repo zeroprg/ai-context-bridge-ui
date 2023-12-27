@@ -23,7 +23,7 @@
 }
 
 /* Root variables for light theme */
-[data-theme="light"] {
+:root {
   --primary-text-color: #333;
   --background-color: #dbcdcd;
   --primary-color-hover: #5a8dbb; /* Adjust as needed */
@@ -32,7 +32,7 @@
   /*  message bar*/
   --secondary-bg-color: #4a76a8; /* Light theme secondary background */
   --icon-color: #FFF; /* Light theme icon color */
-  --input-bg-color: #FFF; /* Light theme input background color */
+  --input-bg-color: #ffffff; /* Light theme input background color */
 
   /* ... other light theme variables ... */
 }
@@ -40,13 +40,13 @@
 /* Dark theme variables */
 [data-theme="dark"] {
   --primary-text-color: #FFF;
-  --background-color: #1A1A1A;
+  --background-color: #433333;
   --primary-color-hover: #4b6a82; /* Adjust as needed */
   --primary-color: #3674a2; /* Adjust primary color for dark theme if needed */
   --app-header-bg-color: #20232a; /* Dark theme background for App-header */
 /*  message bar*/
   --secondary-bg-color: #20232a; /* Dark theme secondary background */
-  --icon-color: #61dafb; /* Dark theme icon color */
+  --icon-color: red; /* Dark theme icon color */
   --input-bg-color: #333; /* Dark theme input background color */
 
 

@@ -6,12 +6,16 @@ import './AddAPI.css'; // Assuming you have a CSS file for styles
 import { useUser } from './UserContext';
 import { API_URLS } from '../apiConstants';
 
+/* Define the constant array for dropdown options */
+const API_NAMES = ["ChatGPT", "LLamaIndex", "Assembly"]; // Replace with actual names
+
+
 const AddAPI: React.FC = () => {
   const { user } = useUser();
   const [apiKey, setApiKey] = useState<ApiKey>({
     keyId: '',
     keyValue: '',
-    name: '',
+    name: API_NAMES[0],
     uri: '',
     homepage: '',
     userId: '',
@@ -52,14 +56,18 @@ const AddAPI: React.FC = () => {
           <input id="keyId" name="keyId" value={apiKey.keyId} onChange={handleChange} />
         </div>
         */}
-        <div className="form-group">
+        <div className="form-group">          
           <label htmlFor="keyValue">API Key Value:</label>
           <input id="keyValue" name="keyValue" value={apiKey.keyValue} onChange={handleChange} />
         </div>
         {/* Add other fields in similar fashion */}
         <div className="form-group">
           <label htmlFor="name">Name:</label>
-          <input id="name" name="name" value={apiKey.name} onChange={handleChange} />
+          <select id="name" name="name" value={apiKey.name} onChange={handleChange}>
+            {API_NAMES.map(name => (
+              <option key={name} value={name}>{name}</option>
+            ))}
+          </select>
         </div>
         {/* ... other fields ... */}
         <div className="form-group">

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <!-- Allowed URLs -->
+    <url>
+        <loc>https://tothemoon.chat:8443/</loc>
+        <changefreq>weekly</changefreq>
+    </url>
+    <url>
+        <loc>https://tothemoon.chat:8443/swagger-ui/index.html</loc>
+        <changefreq>weekly</changefreq>
+    </url>
+    <url>
+        <loc>https://tothemoon.chat</loc>
+        <changefreq>weekly</changefreq>
+    </url>
+
+    <!-- Disallowed URLs -->
+    <url>
+        <loc>https://tothemoon.chat/index.html</loc>
+        <changefreq>never</changefreq>
+    </url>
+    <!-- Add more disallowed URLs here if needed -->
+
+</urlset>

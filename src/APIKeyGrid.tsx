@@ -24,10 +24,12 @@ const APIKeyGrid: React.FC<APIKeyGridProps> = ({ apiKeys, keySelectedId, onRowSe
     SelectColumn,
 
     { key: 'name', name: 'Name' },
-    { key: 'uri', name: 'URI' },
-    { key: 'homepage', name: 'Homepage' },
-    { key: 'userId', name: 'User ID' },
+    { key: 'model', name: 'Model' },
+    { key: 'description', name: 'Description' },
+    { key: 'maxContextLength', name: 'Max. Context Length' },
     { key: 'totalCost', name: 'Total Cost' },
+    { key: 'uri', name: 'URI' },  
+ 
     // Add other columns as needed
   ];
 

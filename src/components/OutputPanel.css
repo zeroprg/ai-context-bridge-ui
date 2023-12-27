@@ -25,8 +25,8 @@
   
   .output-panel code {
     display: block;
-    background-color: var(--secondary-bg-color);
-    color: var(--primary-text-color);
+    color: #008000; /* Classic green color for text */
+    background-color: black; 
     padding: 10px 20px;
     margin: 10px 0;
     border-radius: 20px;
@@ -35,5 +35,18 @@
     word-break: break-word;
   }
   
-  /* Add additional styles as needed */
+  /* log styles as needed */
+
+  .output-panel code.log {
+    color: #008000; /* Classic green color for text */
+    background-color: black; 
+    font-family: monospace; /* Monospace font for a typical log appearance */
+    padding: 2px 4px; /* Some padding for better readability */
+    border-radius: 3px; /* Slightly rounded corners */
+    font-size: 0.9em; /* Adjust the font size as needed */
+    white-space: pre-wrap; /* Wrap white-space as needed */
+    word-break: break-word; /* Break long words to prevent overflow */
+    margin: 2px 0; /* Some margin for spacing between log entries */
+}
+
   

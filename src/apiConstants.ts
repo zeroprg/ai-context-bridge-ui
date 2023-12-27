@@ -15,7 +15,9 @@ export const API_URLS = {
     AttachUserToClient: (userId: any, clientId: any) => `${BASE_URL}/user/${userId}/attach/${clientId}`,
     FindUserByEmail: `${BASE_URL}/user/findByEmail`,
     FindUserByName: `${BASE_URL}/user/findByName`,
-    AssignRole: `${BASE_URL}/user/assignRole`
+    AssignRole: `${BASE_URL}/user/assignRole`,
+    StoreContext: `${BASE_URL}/user/context/store`,
+    GetContext: (sessionId: string) => `${BASE_URL}/user/context/${sessionId}`,
 };
 
 export const CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;

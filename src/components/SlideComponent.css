@@ -39,19 +39,7 @@
   
 
 
-  .toggle-button {
-    position: fixed;
-    top: 50%;
-    left: 0;
-    transform: translateY(-50%);
-    background: var(--secondary-bg-color); /* Use variable for background color */
-    color: var(--primary-text-color); /* Use variable for icon/text color */
-    border: none;
-    cursor: pointer;
-    z-index: 1001;
-    transition: transform 0.3s ease-in-out;
-  }
-  
+
   .toggle-button:hover {
     background: var(--primary-color-hover); /* Use variable for hover color */
     transform: translateY(-50%) translateX(10px);

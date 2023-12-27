@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from './UserContext';
 
@@ -14,6 +15,21 @@ const SlideComponent: React.FC<SlideComponentProps> = ({ title }) => {
   const [buttonHint, setButtonHint] = useState("More info");
   const { user } = useUser();
   const navigate = useNavigate();    
+
+  const toggleButtonStyle:CSSProperties = {
+    position: 'fixed',
+    left: isOpen ? '250px' : '0px',
+    top: '50%',    
+    transform: 'translateY(-50%)',
+    background: 'var(--primary-bg-color)', // Use variable for background color
+    color: 'var(--primary-text-color)', // Use variable for icon/text color
+    border: 'none',
+    cursor: 'pointer',
+    zIndex: 1001,
+    transition: 'transform 0.3s ease-in-out',
+};
+
+  
 
   const navigateToAddAPI = () => {
     navigate("/add-api");
@@ -32,7 +48,9 @@ const SlideComponent: React.FC<SlideComponentProps> = ({ title }) => {
       <ul>
         <li><a href="#add-api" onClick={navigateToAddAPI}>Add a new API key</a></li>
         <li><a href="#share-api">Share my API keys</a></li>
-        <li><a href="#donate">Donate to use other APIs</a></li>
+        <li><a href="https://buy.stripe.com/aEU183cx3flV0mI8wB">Donate $1 to use other APIs</a></li>
+        <li><a href="https://buy.stripe.com/28o4kfeFb4Hhb1maEI">Donate $3 to use other APIs</a></li>        
+        <li><a href="https://buy.stripe.com/fZeaIDeFb3DdglGdQT">Donate $10 to use other APIs</a></li>
       </ul>
     </div>
 
@@ -51,8 +69,8 @@ const SlideComponent: React.FC<SlideComponentProps> = ({ title }) => {
 
     </div>
   </div>
-  <div className="toggle-button" onClick={toggleOpen} title={buttonHint}>
-    {isOpen ? <FaArrowLeft /> : <FaArrowRight />}
+  <div style={toggleButtonStyle} onClick={toggleOpen} title={buttonHint}>
+    {isOpen ? <FaArrowLeft size={30}/> : <FaArrowRight size={30}/>}
   </div>
 </>
   );

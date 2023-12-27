@@ -1,3 +1,9 @@
 # https://www.robotstxt.org/robotstxt.html
+
+Sitemap: https://tothemoon.chat/sitemap.xml
+
 User-agent: *
-Disallow:
+Disallow: /index.html  # Disallow crawling of /index.html
+Disallow: /           # Disallow crawling all other pages
+Allow: /$             # Allow crawling the root URL (https://tothemoon.chat:8443/)
+Allow: /swagger-ui/index.html  # Allow crawling the Swagger UI
