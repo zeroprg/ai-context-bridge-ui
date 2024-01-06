@@ -1,5 +1,5 @@
 // App.js
-import React from 'react';
+import React,{useState} from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './Home';
 import API from './API';
@@ -10,6 +10,8 @@ import Layout from './components/Layout';
 import AddAPI from './components/AddAPI';
 
 const App = () => {
+    const [message, setMessage] = useState('');
+
     const initiateGoogleOAuth = () => {
         const redirectUri = encodeURIComponent(BACKEND_REDIRECT_URI || "not founded in .env file");
         const scope = encodeURIComponent('email');
@@ -24,14 +26,23 @@ const App = () => {
         return Math.random().toString(36).substring(2, 15);
     };
 
+    const handleQueryResult = (msg:string) => {
+        console.log("Message received:", msg);
+        setMessage(msg)
+    };
+
+    const handleSend = (msg:string) => {
+        handleQueryResult(msg);
+    };
+
     return (
         <React.StrictMode>
         <Router>
             <Routes>
               
-                <Route path="/api" element={<UserProviderComponent><Layout> <API /> </Layout></UserProviderComponent>} />
+                <Route path="/api" element={<UserProviderComponent><Layout onSend={handleSend}> <API message={message}/> </Layout></UserProviderComponent>} />
                 <Route path="/" element={ <Home initiateGoogleOAuth={initiateGoogleOAuth} /> } />
-                <Route path="/add-api" element={<UserProviderComponent><Layout> <AddAPI/> </Layout></UserProviderComponent>} />
+                <Route path="/add-api" element={<UserProviderComponent><Layout onSend={handleSend}> <AddAPI/> </Layout></UserProviderComponent>} />
                 {/* Add other routes as needed */}
               
             </Routes>

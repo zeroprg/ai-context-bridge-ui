@@ -23,6 +23,7 @@ interface UserContextProps {
   user: User | null;
   error: string | null;
   getUserInfo: () => void;
+  setUser: (user: User) => void;
 }
 
 // Create the context with a default value
@@ -30,6 +31,7 @@ const UserContext = createContext<UserContextProps>({
   user: null,
   error: null,
   getUserInfo: () => {},
+  setUser: (user: User) => {},
 });
 
 // Export the provider and consumer for ease of use
@@ -52,9 +54,9 @@ export const UserProviderComponent: React.FC<PropsWithChildren<{}>> = ({ childre
       setUser(response.data);
       setError(null);
     } catch (error: any) {
-      const message = error.response?.data?.message || error.message;
-      setError('Error: ' + message);
-      setTimeout(() => setError(null), 5000);
+      //const message = error.response?.data?.message || error.message;
+      //setError('Error: ' + message);
+      //setTimeout(() => setError(null), 5000);
       navigate(LOGIN_PAGE_PATH); // Redirect to the login page
     }
   };
@@ -75,7 +77,7 @@ export const UserProviderComponent: React.FC<PropsWithChildren<{}>> = ({ childre
   }, []);
 
   return (
-    <UserProvider value={{ user, error, getUserInfo }}>
+    <UserProvider value={{ user, error, getUserInfo, setUser }}>
       {children}
     </UserProvider>
   );

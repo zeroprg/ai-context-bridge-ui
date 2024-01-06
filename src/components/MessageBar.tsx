@@ -5,9 +5,10 @@ import * as pdfjsLib from 'pdfjs-dist';
 
 import './MessageBar.css'; // Make sure this CSS file exists
 import { API_URLS } from '../apiConstants'; // Adjust the import path as needed
-import { prepareFileContentAsString } from '../utils/filePreparation';
+import { prepareFileContent } from '../utils/filePreparation';
+
 import { useError } from '../ErrorContext';
-import { storeContext, getContext, queryIndex } from "../utils/llama";
+import { storeContextDocument} from "../utils/llama";
 import FileIcon from '../utils/FileIconProps';
 
 // Set the workerSrc to the path of the pdf.worker.js
@@ -19,22 +20,18 @@ type MessageBarProps = {
     onLogSend: (message: string) => void;
 };
 
-const MAXIMUM_CHARACTER_TOSHOW = 10;
-
-
 const MessageBar: React.FC<MessageBarProps> = ({ message, onSend, onLogSend }) => {
     const { handleError } = useError();
     const [messageText, setMessageText] = useState(message);
-    const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [filesContent, setFilesContent] = useState<Map<string, string[]>>(new Map());    
     const [isLoading, setIsLoading] = useState(false); // State to track loading
-
-
-
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files[0]) {
             filePreparation(event.target.files[0]);
+                    // Reset the value of the input to ensure onChange fires again with the same file
+        event.target.value = '';
+
         }
     };
 
@@ -42,37 +39,43 @@ const MessageBar: React.FC<MessageBarProps> = ({ message, onSend, onLogSend }) =
         try {
             if (selectedFile) {
                 onLogSend(`${selectedFile.name} start uploading......`);
-                const documents = await prepareFileContentAsString(selectedFile);
+                const documents:string[] = await prepareFileContent(selectedFile);
                 if (documents.length === 0) {
-                    throw new Error(`Unsupported file type for: ${selectedFile.name}`);
+                    throw new Error(`Unsupported file type for: ${selectedFile.name} we will support it soon` );
                 }
 
                 // Store index and update filesContent state
-                storeContext(selectedFile.name,  documents);
+                storeContextDocument(selectedFile.name,  documents);
                 // Invoke onLogSend with the log message
                 onLogSend(`${selectedFile.name} was uploaded and indexed/stored in your private context.`);
                 setFilesContent(new Map(filesContent.set(selectedFile.name, documents)));
+               
             }
-            setSelectedFile(null);
+           // setSelectedFile(null);
         } catch (error: any) {
             console.error('Error sending message:', error);
             handleError('' + error + ' ' + error.response?.data.message, error);
         }
     };
 
-    const handleRemoveFile = (fileName: string) => {
-        // Remove file from filesContent state
-        filesContent.delete(fileName);
-        setFilesContent(new Map(filesContent));
+    const handleRemoveFile = (fileName: string) => {     
+
+        // Remove file from context
+        axios.delete(API_URLS.DeleteFileFromContext(fileName), {withCredentials: true}).then(response =>{
+            // Remove file from filesContent state
+            filesContent.delete(fileName);
+            setFilesContent(new Map(filesContent));
+             })
+        .catch(error => {handleError('' + error + ' ' + error.response?.data.message, error);  })
     }    
 
 
     const handleSendClick = async () => {
         setIsLoading(true); // Start loading
         try {
-            let payload = `${messageText}`; ///add prompts here
+            const payload = `${messageText}`; ///add prompts here
             const response = await axios.post(API_URLS.CustomerQuery, { data: payload }, { withCredentials: true });
-            onSend(response.data);
+            onSend(`You: ${messageText} \n ${response.data}`);
         } catch (error: any) {
             handleError('' + error + ' ' + error.response?.data.message, error);
         }

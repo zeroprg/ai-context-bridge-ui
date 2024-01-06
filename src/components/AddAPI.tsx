@@ -15,12 +15,16 @@ const AddAPI: React.FC = () => {
   const [apiKey, setApiKey] = useState<ApiKey>({
     keyId: '',
     keyValue: '',
-    name: API_NAMES[0],
+    name: '',
     uri: '',
     homepage: '',
     userId: '',
+    maxContextLength: 0, // Max context length
     totalCost: 0,
     publicAccessed: false,
+    defaultKey: true,
+    model: '',
+    description: '',
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {

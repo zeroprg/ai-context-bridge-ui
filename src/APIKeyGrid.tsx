@@ -12,8 +12,6 @@ interface APIKeyGridProps {
 }
 const APIKeyGrid: React.FC<APIKeyGridProps> = ({ apiKeys, keySelectedId, onRowSelected }) => {
     const [selectedRows, setSelectedRows] = useState<ReadonlySet<string>>(new Set());
-    
-
     // useEffect to update selectedRows based on keySelectedId prop
     useEffect(() => {
       if (keySelectedId) {
@@ -49,9 +47,21 @@ const APIKeyGrid: React.FC<APIKeyGridProps> = ({ apiKeys, keySelectedId, onRowSe
       rows={apiKeys}
       selectedRows={selectedRows}
       onSelectedRowsChange={(newSelectedRows) => {
-        setSelectedRows(newSelectedRows);
-        onRowSelected(newSelectedRows); // Notify parent component of the selection change
-      }}
+        // Extract the latest selected row's key, ensuring it is a string
+        const selectedRowArray = Array.from(newSelectedRows);
+        const latestSelectedRowKey = selectedRowArray.length > 0 
+            ? selectedRowArray[selectedRowArray.length - 1] 
+            : null;
+
+        // Update the selectedRows state
+        if (latestSelectedRowKey) {
+            const latestSelectedRow: ReadonlySet<string> = new Set([latestSelectedRowKey]);
+            setSelectedRows(latestSelectedRow);
+            onRowSelected(latestSelectedRow); // Notify parent component of the selection change
+        } else {
+            setSelectedRows(new Set()); // Empty set when no rows are selected
+        }
+    }}
       rowKeyGetter={rowKeyGetter}
 
     />

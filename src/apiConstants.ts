@@ -18,6 +18,11 @@ export const API_URLS = {
     AssignRole: `${BASE_URL}/user/assignRole`,
     StoreContext: `${BASE_URL}/user/context/store`,
     GetContext: (sessionId: string) => `${BASE_URL}/user/context/${sessionId}`,
+    GPTAssistantRoles: `${BASE_URL}/user/GPTAssistantRoles`,
+    GPTAssistantRole: `${BASE_URL}/user/GPTAssistantRole`,
+    SetGPTAssistantRole: `${BASE_URL}/user/setGPTAssistantRole`,   
+    DeleteFileFromContext: (fileId: string) => `${BASE_URL}/user/context/deleteFile?fileId=${encodeURIComponent(fileId)}`,
+
 };
 
 export const CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;

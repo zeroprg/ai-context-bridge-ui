@@ -12,6 +12,8 @@
     "@types/react": "^18.2.42",
     "@types/react-dom": "^18.2.17",
     "axios": "^1.6.2",
+    "lodash": "^4.17.21",
+    "mammoth": "^1.6.0",
     "pdfjs-dist": "^4.0.269",
     "react": "^18.2.0",
     "react-data-grid": "^7.0.0-beta.41",
@@ -21,17 +23,16 @@
     "react-scripts": "5.0.1",
     "tesseract.js": "^5.0.3",
     "typescript": "^4.9.5",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "xlsx": "^0.18.5"
   },
   "scripts": {
-    "start": "react-scripts start", 
+    "start": "react-scripts start",
     "build": "react-scripts build && npm run uglify",
     "uglify": "uglifyjs-folder ./build/static/js -eo ./build/static/js",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
-
   },
-
   "eslintConfig": {
     "extends": [
       "react-app",
@@ -49,6 +50,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.202",
+    "@types/react-onclickoutside": "^6.7.8"
   }
-
 }

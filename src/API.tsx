@@ -12,25 +12,42 @@ import MessageBar from './components/MessageBar';
 import OutputPanel from './components/OutputPanel';
 import { useUser } from './components/UserContext';
 import { useError } from './ErrorContext';
+import ChatGPTIndicator from './components/ChatGPTIndicator';
 
+interface APIProps {
+  message: string;
+}
 
-const API: React.FC = () => {
+const API: React.FC<APIProps> = ({ message }) => {
+
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
   const { user } = useUser();
   const { handleError } = useError();
  
   const [selectedApiKey, setSelectedApiKey] = useState<string>(user?.recentApiId || '');
   const [queryResult, setQueryResult] = useState<string>('');
+  const [APIGridOpen, setAPIGridOpen] = useState<boolean>(true);
   const location = useLocation();
   /* for working with Message Bar */
   const [prompt] = useState('');
   const [logMessage, setlogMessage] = useState('');
 
-  // Define a function to handle sending the message
-  const handleQueryResult = (message: string) => {
+    // Define a function to handle sending the message
+  const handleQueryResult = (message: string) => { 
       // Set the entered message to the state.
+      setAPIGridOpen(false);
       setQueryResult(message);
+      setlogMessage('');
   };
+
+    // Use the message prop as needed
+    React.useEffect(() => {
+      if (message) {
+        console.log("Received message:", message);
+        // Perform actions based on the message
+        handleQueryResult(message);
+      }
+    }, [message]); // React to changes in the message prop
 
   const handleTechnicalMessage = (message: string) => { 
     /* handle logic to send technical message to OutputPanel  */  
@@ -38,15 +55,6 @@ const API: React.FC = () => {
   }  
 
   
-
-  useEffect(() => {
-    if (user) {
-      // Update selectedApiKey when user changes from null to not null
-      setSelectedApiKey(user.recentApiId || '');
-    }
-  }, [user]); // Dependency array includes user to trigger effect when user changes
-
-
   /* for grabbing API keys */
   useEffect(() => {
     //setSelectedApiKey(user?.recentApiId || '');
@@ -56,7 +64,11 @@ const API: React.FC = () => {
             setApiKeys(response.data);
              })
         .catch(error => {handleError('Error fetching API keys ',error);  })
-    }, [location]);
+    if (user) {
+      // Update selectedApiKey when user changes from null to not null
+      setSelectedApiKey(user.recentApiId || '');
+    }    
+    }, [user, location]);
 
   const selectApiKey = async (apiKey: string) => {
     try{     
@@ -72,13 +84,26 @@ const API: React.FC = () => {
   const onRowSelected = (selectedRows: ReadonlySet<string>) => {
     // Example implementation: log the selected row keys
     console.log("Selected Rows:", Array.from(selectedRows));
-    selectApiKey(Array.from(selectedRows)[0]);  
-
+    selectApiKey(Array.from(selectedRows)[0]); 
   };
 
+  const getApiKeyById = (id: string): ApiKey => {
+    return apiKeys.find((apiKey) => apiKey.keyId === id) ?? {} as ApiKey;
+  };
+
+  const handleMouseEnter = () => {
+      setAPIGridOpen(true);
+  };
+
+
   return (
-<div className="api-container">
+    
+  <div>
+    { selectedApiKey && <ChatGPTIndicator apiKey={getApiKeyById(selectedApiKey)} onMouseEnter={handleMouseEnter} />}
+    <div className="api-container">
+    
     {/* ... Existing code for creating and displaying API keys ... */}
+   { apiKeys && APIGridOpen &&
     <div className="api-key-grid-container">
         <APIKeyGrid 
             apiKeys={apiKeys} 
@@ -86,6 +111,7 @@ const API: React.FC = () => {
             onRowSelected={onRowSelected}
         />
     </div>
+    }
     <div className="api-container">
       <OutputPanel message={queryResult} logMessage={logMessage} />         
       <MessageBar message={prompt} onSend={handleQueryResult} onLogSend={handleTechnicalMessage} />
@@ -93,8 +119,8 @@ const API: React.FC = () => {
     </div>
 
 
-</div>
-
+    </div>
+  </div>
   );
 }
 

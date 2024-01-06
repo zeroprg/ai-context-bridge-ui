@@ -1,0 +1,62 @@
+/* ChatGPTIndicator.css */
+.chatgpt-indicator {
+    position: fixed; /* Fixed position relative to the viewport */
+    top: 0;          /* Positioned at the top of the viewport */
+    left: 0;         /* Positioned at the left of the viewport */
+    background-color:var(--secondary-bg-color);; /* Dark background */
+    color: var(--icon-color);    /* White text, assuming from the image */
+    padding: 0.5em 1em; /* Some padding around the text */
+    z-index: 1000;   /* Ensure it sits on top of other elements */
+    font-size: 16px; /* Font size similar to the image */
+    font-family: Arial, sans-serif; /* Common font family */
+    display: inline-flex; /* Use flexbox for alignment */
+    align-items: center; /* Center items vertically */
+    border-radius: 4px; /* Rounded corners similar to the image */
+   
+  }
+  
+  .chatgpt-indicator {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    /* ... rest of the styles as before ... */
+  }
+  
+
+  .chatgpt-dropdown {
+    position: absolute;
+    top: 100%; /* Positioned right below the indicator */
+    left: 0;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    width: 200px; /* Set a width for the dropdown */
+    z-index: 1001; /* Ensure it's above other elements */
+    width: max-content; 
+  }
+  
+  .dropdown-item {
+    padding: 8px 12px;
+    border-bottom: 1px solid #ddd; /* Separate items */
+    cursor: pointer; /* Pointer cursor on hover */
+    color: black
+  }
+  
+  .dropdown-item:last-child {
+    border-bottom: none; /* Remove border for the last item */
+  }
+
+  .green-text {
+    color: green;
+  }
+
+  @keyframes flashing {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  .chatgpt-indicator-flashing {
+    animation: flashing 1s infinite; /* Apply the flashing animation */
+  }
+  

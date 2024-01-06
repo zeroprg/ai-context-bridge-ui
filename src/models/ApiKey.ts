@@ -5,7 +5,11 @@ export interface ApiKey {
     uri: string;
     homepage: string;
     userId: string;
+    maxContextLength: number; // Max context length
     totalCost: number;
-    publicAccessed:boolean;
-    // Include other properties if needed
+    publicAccessed: boolean;
+    defaultKey: boolean;
+    model: string;
+    description: string;
+
   }

@@ -27,6 +27,9 @@
     display: block;
     color: #008000; /* Classic green color for text */
     background-color: black; 
+    font-family: monospace; /* Monospace font for a typical log appearance */
+    font-size: larger;
+    font-style: bold;
     padding: 10px 20px;
     margin: 10px 0;
     border-radius: 20px;
@@ -41,6 +44,8 @@
     color: #008000; /* Classic green color for text */
     background-color: black; 
     font-family: monospace; /* Monospace font for a typical log appearance */
+    font-size: larger;
+    font-style: bold;
     padding: 2px 4px; /* Some padding for better readability */
     border-radius: 3px; /* Slightly rounded corners */
     font-size: 0.9em; /* Adjust the font size as needed */
@@ -49,4 +54,12 @@
     margin: 2px 0; /* Some margin for spacing between log entries */
 }
 
+.user-prompt {
+  color: #4a90e2; /* Blue color for user prompts */
+  font-style: italic;
+  margin: 10px 0;
+  padding: 5px;
+  border-left: 3px solid #4a90e2;
+  background-color: #f0f4f8;
+}
   

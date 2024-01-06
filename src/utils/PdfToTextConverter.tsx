@@ -10,10 +10,10 @@ export class PdfToTextConverter {
         this.file = file;
     }
 
-    async extractText(): Promise<string> {
+    async extractText(): Promise<string[]> {
         const url = URL.createObjectURL(this.file);
         const pdf = await getDocument(url).promise;
-        let fullText = '';
+        let pagesText: string[] = [];
     
         for (let startPage = 1; startPage <= pdf.numPages; startPage += this.batchSize) {
             const endPage = Math.min(startPage + this.batchSize - 1, pdf.numPages);
@@ -22,24 +22,24 @@ export class PdfToTextConverter {
                 imageSources.map(source => this.performOCR(source))
             );
     
-            // Append each page's text with its index
+            // Add each page's text to the array
             for (let i = 0; i < batchTexts.length; i++) {
-                fullText += `Page ${startPage + i}:\n${batchTexts[i]}\n\n`;
+                pagesText.push(`Page ${startPage + i}:\n${batchTexts[i]}`);
             }
     
             this.clearStoredCanvases(); // Clear canvases to save memory
         }
     
-        return fullText;
+        return pagesText;
     }
-    
+        
 
     private async convertBatchOfPdfToImages(pdf: PDFDocumentProxy, startPage: number, endPage: number): Promise<string[]> {
         const imageSources: string[] = [];
 
         for (let pageNum = startPage; pageNum <= endPage; pageNum++) {
             const page = await pdf.getPage(pageNum);
-            const viewport = page.getViewport({ scale: 1.5 });
+            const viewport = page.getViewport({ scale: 2 });
             const canvas = document.createElement('canvas');
             const context = canvas.getContext('2d')!;
             

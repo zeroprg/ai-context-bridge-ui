@@ -22,6 +22,7 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
 
     if (errorObject && isConnectionError(errorObject)) {
       setCookie('sessionId', '', -1);
+      setError(errorObject.code + ' Please refresh the page to log in again.' );
     }
   };
 

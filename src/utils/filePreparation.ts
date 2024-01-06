@@ -1,7 +1,9 @@
 // filePreparation.ts
 import { getDocument } from 'pdfjs-dist';
+import * as XLSX from 'xlsx';
+import Tesseract from 'tesseract.js';
+
 import PdfToTextConverter from './PdfToTextConverter';
-import { getContext, storeContext, queryIndex } from './llama';
 
 export async function query(query: string) {
  // const indexId = await getContext();
@@ -12,7 +14,7 @@ export async function query(query: string) {
 const TEXT_CONTENT_THRESHOLD = 50; // Percentage
 
 
-export async function prepareFileContentAsString(file: File): Promise<string[]> {
+export async function prepareFileContent(file: File): Promise<string[]> {
     if (file.type.startsWith('text/')) {
         const text = await prepareTextFileContent(file);
         return [text];
@@ -20,14 +22,76 @@ export async function prepareFileContentAsString(file: File): Promise<string[]> 
         const { isImageBased, textContents } = await checkPdfContent(file);
         if (isImageBased) {
             const converter = new PdfToTextConverter(file);
-            const text = await converter.extractText();
-            return [text];
+            const text: string[] = await converter.extractText();
+            return text;
         } else {
-            return [textContents.join(' ')];
+            return textContents;
         }
+    } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+
+        // Check if mammoth is already loaded
+        if (typeof mammoth === 'undefined') {
+            await loadMammothScript();
+        }
+
+        // Handle .docx files
+        return await prepareDocxFileContent(file);
+    } else if (file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || file.type === 'text/csv') {
+        // Handle .xlsx and .csv files
+        return await prepareExcelCsvFileContent(file);
+    } else if (file.type.startsWith('image/')) {
+        // Process image file
+        return await processImageFile(file);
+    } else {
+        console.log('Unsupported file type');
     }
 
     return [];
+}
+
+async function processImageFile(file: File): Promise<string[]> {
+    try {
+        const result = await Tesseract.recognize(file, 'eng');
+        const text = result.data.text;
+        return [text]; // Returning the recognized text in an array
+    } catch (error) {
+        console.error('Error processing image file:', error);
+        return [];
+    }
+}
+
+function loadMammothScript(): Promise<void> {
+    return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = "https://unpkg.com/mammoth/mammoth.browser.min.js";
+        script.onload = () => resolve();
+        script.onerror = () => reject(new Error('Failed to load mammoth script'));
+        document.head.appendChild(script);
+    });
+}
+
+async function prepareDocxFileContent(file: File): Promise<string[]> {
+    const arrayBuffer = await file.arrayBuffer();
+    const result = await mammoth.extractRawText({ arrayBuffer });
+    return result.value.split('\n'); // Splitting text into lines
+}
+
+async function prepareExcelCsvFileContent(file: File): Promise<string[]> {
+    const arrayBuffer = await file.arrayBuffer();
+    const workbook = XLSX.read(arrayBuffer, { type: 'buffer' });
+    let allSheets: string[] = [];
+
+    workbook.SheetNames.forEach((sheetName: string) => { 
+        const worksheet = workbook.Sheets[sheetName];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+        const sheetData = {
+            sheetName: sheetName,
+            data: jsonData
+        };
+        allSheets.push(JSON.stringify(sheetData, null, 2)); // Convert each sheet's data to a JSON string
+    });
+
+    return allSheets;
 }
 
 async function checkPdfContent(file: File): Promise<{ isImageBased: boolean; textContents: string[] }> {
