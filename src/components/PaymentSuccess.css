@@ -1,0 +1,28 @@
+.payment-success {
+    text-align: center;
+    padding: 50px;
+    background-color: #f3f3f3;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    max-width: 600px;
+    margin: 50px auto;
+}
+
+.payment-success h1 {
+    color: #4CAF50; /* Green color for success */
+}
+
+.payment-success p {
+    font-size: 16px;
+    color: #333;
+}
+
+.payment-success a {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #4CAF50; /* Green color for success */
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+}

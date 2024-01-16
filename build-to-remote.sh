@@ -1,4 +1,5 @@
 #!/bin/bash
+
 # Check if there are exactly two arguments provided
 if [ "$#" -ne 2 ]; then
     echo "Usage: $0 ip_address password"
@@ -9,16 +10,26 @@ fi
 ip_address=$1
 password=$2
 
-# Install dependencies and build the React app
+# Production build directory
+prod_build_dir="./prod_build"
+
+# Create the production build directory if it doesn't exist
+mkdir -p $prod_build_dir
+
+# Install dependencies
 npm install
-NODE_ENV="production" npm run build
+
+# Build the React app and place it in the production build directory
+NODE_ENV="production" npm run build --output-path $prod_build_dir
+
+node replaceJsReferences.js $prod_build_dir
 
 # Directory where the React app build is located
-build_dir="./build/*"
+build_dir="$prod_build_dir/*"
 
 # Destination directory on the server
 dest_dir="/var/www/html"
-# is it for test# dest_dir="/home/zeroprg/react_files"
+
 # The user on the remote server
 remote_user="zeroprg"
 
@@ -35,9 +46,7 @@ else
 fi
 
 # Restart Nginx on the remote server to apply changes
-# Note: This requires the remote user to have the necessary permissions
 echo "$password" | sshpass -p "$password" ssh $remote_user@$ip_address "sudo -S systemctl restart nginx"
-
 
 # Check if the ssh command was successful
 if [ $? -eq 0 ]; then

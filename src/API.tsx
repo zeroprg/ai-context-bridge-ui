@@ -29,7 +29,7 @@ const API: React.FC<APIProps> = ({ message }) => {
   const [APIGridOpen, setAPIGridOpen] = useState<boolean>(true);
   const location = useLocation();
   /* for working with Message Bar */
-  const [prompt] = useState('');
+  const [prompt ] = useState('');
   const [logMessage, setlogMessage] = useState('');
 
     // Define a function to handle sending the message
@@ -40,6 +40,8 @@ const API: React.FC<APIProps> = ({ message }) => {
       setlogMessage('');
   };
 
+ 
+
     // Use the message prop as needed
     React.useEffect(() => {
       if (message) {
@@ -47,7 +49,7 @@ const API: React.FC<APIProps> = ({ message }) => {
         // Perform actions based on the message
         handleQueryResult(message);
       }
-    }, [message]); // React to changes in the message prop
+    }, [message,prompt]); // React to changes in the message prop
 
   const handleTechnicalMessage = (message: string) => { 
     /* handle logic to send technical message to OutputPanel  */  
@@ -113,7 +115,7 @@ const API: React.FC<APIProps> = ({ message }) => {
     </div>
     }
     <div className="api-container">
-      <OutputPanel message={queryResult} logMessage={logMessage} />         
+      <OutputPanel message={queryResult} logMessage={logMessage}/>         
       <MessageBar message={prompt} onSend={handleQueryResult} onLogSend={handleTechnicalMessage} />
 
     </div>

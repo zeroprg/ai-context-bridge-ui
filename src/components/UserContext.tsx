@@ -16,6 +16,7 @@ interface User {
   pictureLink: string; // Link to picture icon
   clientId: string; // ClientId linked to client (company profile)
   roles: Set<string>; // User's roles as strings
+  credit: number; // User's credit
 }
 
 
@@ -23,8 +24,9 @@ interface UserContextProps {
   user: User | null;
   error: string | null;
   getUserInfo: () => void;
-  setUser: (user: User) => void;
+  setUser: (user: User) => void;  
 }
+
 
 // Create the context with a default value
 const UserContext = createContext<UserContextProps>({

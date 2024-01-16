@@ -6,6 +6,7 @@ import './ChatGPTIndicator.css'; // Make sure to create this CSS file
 import { API_URLS } from "../apiConstants"
 import { ApiKey } from '../models/ApiKey';
 import { useError } from '../ErrorContext';
+import { Role } from '../models/Role';
 
 
 interface APIKeyGridProps {
@@ -19,11 +20,11 @@ const ChatGPTIndicator: React.FC<APIKeyGridProps> = ({ apiKey, onMouseEnter }) =
   const [selectedAPI] = useState(apiKey.model);
   const [selectedRole, setSelectedRole] = useState('');
   const [isOpen, setIsOpen] = useState(false);
-  const [roles, setRoles] = useState<string[]>([]);
+  const [roles, setRoles] = useState<Role[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const indicatorClass = selectedRole ? "chatgpt-indicator" : "chatgpt-indicator chatgpt-indicator-flashing";
+  const indicatorClass = isOpen || selectedRole ? "chatgpt-indicator" : "chatgpt-indicator chatgpt-indicator-flashing";
 
 
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -48,7 +49,7 @@ const ChatGPTIndicator: React.FC<APIKeyGridProps> = ({ apiKey, onMouseEnter }) =
     if(!selectedRole){
       setLoading(true);
       axios.get(API_URLS.GPTAssistantRole, { withCredentials: true }).then(response => {
-        setSelectedRole(response.data);
+        setSelectedRole(response.data.role);
         setError('');
       })
         .catch(err => { handleError('Failed to fetch  selected Assistant role', err); console.error(err); })
@@ -84,16 +85,16 @@ const ChatGPTIndicator: React.FC<APIKeyGridProps> = ({ apiKey, onMouseEnter }) =
     <div className="chatgpt-indicator-container" onMouseEnter={onMouseEnter}>
      
       <div className={indicatorClass} onClick={toggleDropdown}>  
-        {selectedAPI} act as {selectedRole} <span className="dropdown-indicator">{isOpen ? '▲' : '▼'}</span>
+        {selectedAPI} acts as {selectedRole} <span className="dropdown-indicator">{isOpen ? '▲' : '▼'}</span>
 
         {isOpen && (
           <div ref={wrapperRef} className="chatgpt-dropdown">
             {loading && <div>Loading...</div>}
             {error && <div>{error}</div>}
             {roles.map((role, index) => (
-              <div key={index} className="dropdown-item" onClick={() => handleRoleSelect(role)}>{role}</div>
+                <div key={index} className="dropdown-item" title={role.description} onClick={() => handleRoleSelect(role.role)}>{role.role}</div>
             ))}
-          </div>
+        </div>
         )}
       </div>
     </div>

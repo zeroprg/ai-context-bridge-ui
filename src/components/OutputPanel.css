@@ -23,7 +23,7 @@
     /* Removed max-height to allow dynamic growth */
 }
   
-  .output-panel code {
+  .output-panel div {
     display: block;
     color: #008000; /* Classic green color for text */
     background-color: black; 
@@ -40,7 +40,7 @@
   
   /* log styles as needed */
 
-  .output-panel code.log {
+  .output-panel div.log {
     color: #008000; /* Classic green color for text */
     background-color: black; 
     font-family: monospace; /* Monospace font for a typical log appearance */
@@ -63,3 +63,11 @@
   background-color: #f0f4f8;
 }
   
+table, th, td {
+  border: 1px solid  #4a90e2;
+  border-collapse: collapse;
+}
+th, td {
+  padding: 8px;
+  text-align: left;
+}

@@ -10,10 +10,14 @@ import { prepareFileContent } from '../utils/filePreparation';
 import { useError } from '../ErrorContext';
 import { storeContextDocument} from "../utils/llama";
 import FileIcon from '../utils/FileIconProps';
+import useSandingBox from './hooks/useSandingBox';
+import SandingBox from './SandingBox';
+import AudioTranscription from './AudioTranscription';
 
 // Set the workerSrc to the path of the pdf.worker.js
-pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.269/pdf.worker.min.mjs`;
+pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.mjs`;
 
+const PROMT_GENERATION_QUERY = 'Based on uploaded text generate prompt questions. Show only list of questions. Ask to draw it as table.';
 type MessageBarProps = {
     message: string;
     onSend: (message: string) => void;
@@ -21,10 +25,11 @@ type MessageBarProps = {
 };
 
 const MessageBar: React.FC<MessageBarProps> = ({ message, onSend, onLogSend }) => {
+    const { isLoading, setIsLoading, mousePosition } = useSandingBox();
     const { handleError } = useError();
     const [messageText, setMessageText] = useState(message);
     const [filesContent, setFilesContent] = useState<Map<string, string[]>>(new Map());    
-    const [isLoading, setIsLoading] = useState(false); // State to track loading
+   // const [isLoading, setIsLoading] = useState(false); // State to track loading
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files[0]) {
@@ -46,10 +51,12 @@ const MessageBar: React.FC<MessageBarProps> = ({ message, onSend, onLogSend }) =
 
                 // Store index and update filesContent state
                 storeContextDocument(selectedFile.name,  documents);
+
+
                 // Invoke onLogSend with the log message
                 onLogSend(`${selectedFile.name} was uploaded and indexed/stored in your private context.`);
                 setFilesContent(new Map(filesContent.set(selectedFile.name, documents)));
-               
+                setTimeout(generateFilesPrompts, 500);
             }
            // setSelectedFile(null);
         } catch (error: any) {
@@ -69,18 +76,33 @@ const MessageBar: React.FC<MessageBarProps> = ({ message, onSend, onLogSend }) =
         .catch(error => {handleError('' + error + ' ' + error.response?.data.message, error);  })
     }    
 
+    const generateFilesPrompts = async () => {
+        setIsLoading(true); // Start loading
+        try {
+            const payload = `${PROMT_GENERATION_QUERY}`; ///add prompts here
+            const response = await axios.post(API_URLS.CustomerQuery, { data: payload }, { withCredentials: true });
+            onSend(`<prompts>${response.data}</prompts>`);
+        } catch (error: any) {
+            handleError('' + error + ' ' + error.response?.data.message, error);
+        } finally {
+            setIsLoading(false); // End loading
+            setMessageText('');
+        }
+    }    
 
     const handleSendClick = async () => {
         setIsLoading(true); // Start loading
+        setMessageText('');
+        adjustTextareaHeight();
         try {
             const payload = `${messageText}`; ///add prompts here
             const response = await axios.post(API_URLS.CustomerQuery, { data: payload }, { withCredentials: true });
             onSend(`You: ${messageText} \n ${response.data}`);
         } catch (error: any) {
             handleError('' + error + ' ' + error.response?.data.message, error);
+        } finally {
+            setIsLoading(false); // End loading           
         }
-        setIsLoading(false); // End loading
-        setMessageText('');
     };
 
     const handleKeyPress = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -105,19 +127,20 @@ const MessageBar: React.FC<MessageBarProps> = ({ message, onSend, onLogSend }) =
 
 return (
     <div>
+     {isLoading && <SandingBox mousePosition={mousePosition} />}    
     <div className="message-bar">
         {/* File icons and names with hover content */}
         <label htmlFor="file-upload">
             <AiOutlinePaperClip className="attachment-icon" />
-        </label>
-
+        </label>       
         <input
             type="file"
             id="file-upload"
+            title='Load any file to your private context to process it.'
             style={{ display: 'none' }}
             onChange={handleFileChange}
         />
-
+        <AudioTranscription  onTranscription={(transcript) => console.log(transcript)} />
         <textarea
                 ref={textareaRef}
                 className="message-input"

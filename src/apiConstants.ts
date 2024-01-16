@@ -1,4 +1,5 @@
 const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+const WS_BASE_URL = process.env.REACT_APP_WS_BASE_URL;
 
 
 export const OAuthToken = localStorage.getItem('oauthToken');
@@ -22,6 +23,9 @@ export const API_URLS = {
     GPTAssistantRole: `${BASE_URL}/user/GPTAssistantRole`,
     SetGPTAssistantRole: `${BASE_URL}/user/setGPTAssistantRole`,   
     DeleteFileFromContext: (fileId: string) => `${BASE_URL}/user/context/deleteFile?fileId=${encodeURIComponent(fileId)}`,
+    StripeCheckout: `${BASE_URL}/stripepayment/create-checkout-session`,
+    WsTransript: `${BASE_URL}/topic/transcription`,
+    WsAudio: `${WS_BASE_URL}/ws/audio`,
 
 };
 

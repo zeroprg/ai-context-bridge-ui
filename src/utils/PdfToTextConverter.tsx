@@ -4,7 +4,7 @@ import Tesseract from 'tesseract.js';
 export class PdfToTextConverter {
     private file: File;
     private readonly batchSize = 5; // Number of pages to process at once
-    private canvasElements: HTMLCanvasElement[] = []; // To store canvas elements
+    private imageSources: string[] = []; // To store canvas elements
 
     constructor(file: File) {
         this.file = file;
@@ -17,9 +17,9 @@ export class PdfToTextConverter {
     
         for (let startPage = 1; startPage <= pdf.numPages; startPage += this.batchSize) {
             const endPage = Math.min(startPage + this.batchSize - 1, pdf.numPages);
-            const imageSources = await this.convertBatchOfPdfToImages(pdf, startPage, endPage);
+            this.imageSources = await PdfToTextConverter.convertBatchOfPdfToImages(pdf, startPage, endPage);
             const batchTexts = await Promise.all(
-                imageSources.map(source => this.performOCR(source))
+                this.imageSources.map(source => this.performOCR(source))
             );
     
             // Add each page's text to the array
@@ -34,7 +34,7 @@ export class PdfToTextConverter {
     }
         
 
-    private async convertBatchOfPdfToImages(pdf: PDFDocumentProxy, startPage: number, endPage: number): Promise<string[]> {
+    static async convertBatchOfPdfToImages(pdf: PDFDocumentProxy, startPage: number, endPage: number): Promise<string[]> {
         const imageSources: string[] = [];
 
         for (let pageNum = startPage; pageNum <= endPage; pageNum++) {
@@ -45,15 +45,38 @@ export class PdfToTextConverter {
             
             canvas.width = viewport.width;
             canvas.height = viewport.height;
-
+    
             await page.render({ canvasContext: context, viewport: viewport }).promise;
             imageSources.push(canvas.toDataURL('image/jpeg'));
-
-            this.canvasElements.push(canvas); // Store canvas for potential display
         }
-
+    
         return imageSources;
-    }
+    };
+
+    static async renderImageOnCanvas(imageSources: string[], canvasRef: React.RefObject<HTMLCanvasElement>): Promise<HTMLImageElement | null> {
+        return new Promise((resolve, reject) => {
+            if (imageSources.length > 0 && canvasRef.current) {
+                const canvas = canvasRef.current;
+                const context = canvas.getContext('2d');
+                if (context) {
+                    const image = new Image();
+                    image.onload = () => {
+                        canvas.width = image.width;
+                        canvas.height = image.height;
+                        context.drawImage(image, 0, 0);
+                        resolve(image); // Resolve the promise with the Image object
+                    };
+                    image.onerror = reject; // Reject the promise in case of an error
+                    image.src = imageSources[0];
+                } else {
+                    reject(new Error("Canvas context not available"));
+                }
+            } else {
+                reject(new Error("No image sources or canvas reference provided"));
+            }
+        });
+    };
+    
 
     private async performOCR(imageSource: string): Promise<string> {
         const { data: { text } } = await Tesseract.recognize(imageSource, 'eng');
@@ -61,11 +84,11 @@ export class PdfToTextConverter {
     }
 
     private clearStoredCanvases(): void {
-        this.canvasElements = [];
+        this.imageSources = [];
     }
 
-    public getStoredCanvases(): HTMLCanvasElement[] {
-        return this.canvasElements;
+    public getStoredCanvases(): string[] {
+        return this.imageSources;
     }
 }
 
