@@ -24,8 +24,9 @@ export const API_URLS = {
     SetGPTAssistantRole: `${BASE_URL}/user/setGPTAssistantRole`,   
     DeleteFileFromContext: (fileId: string) => `${BASE_URL}/user/context/deleteFile?fileId=${encodeURIComponent(fileId)}`,
     StripeCheckout: `${BASE_URL}/stripepayment/create-checkout-session`,
-    WsTransript: `${BASE_URL}/topic/transcription`,
-    WsAudio: `${WS_BASE_URL}/ws/audio`,
+    //WsTransript: `${BASE_URL}/topic/transcription`,
+    //WsAudio: `${WS_BASE_URL}/ws/audio`,
+    HttpAudioTranscript: `${BASE_URL}/api/v1/transcription`
 
 };
 

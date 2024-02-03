@@ -1,0 +1,52 @@
+import useWebSocket, { ReadyState } from 'react-use-websocket';
+import { useEffect } from 'react';
+
+interface WebSocketClientReturn {
+  sendJsonMessage: (message: any) => void;
+  closeWebSocket: () => void;
+  readyState: ReadyState;
+}
+
+export const useWebSocketClient = (
+  WS_URL: string,
+  onTranscription: (message: string) => void,
+  onError: (errorMessage: string) => void
+): WebSocketClientReturn => {
+  const { lastMessage, readyState, sendJsonMessage, getWebSocket } = useWebSocket(WS_URL, {
+    shouldReconnect: () => true,
+  });
+
+  useEffect(() => {
+    if (lastMessage !== null) {
+      const messageData = lastMessage.data;
+      const errorMessage = extractErrorMessage(messageData);
+      if (errorMessage) {
+    
+        onError(errorMessage);
+      } else {
+        onTranscription(messageData);
+      }
+    }
+  }, [lastMessage, onTranscription, onError]);
+
+  const closeWebSocket = () => {
+    const websocket = getWebSocket();
+    if (websocket) {
+      websocket.close();
+    }
+  };
+
+  return { sendJsonMessage, closeWebSocket, readyState };
+};
+
+const extractErrorMessage = (data: string): string  => {
+  let errorPattern = /PERMISSION_DENIED:([\s\S]*?)(?=\. Enable it)/;
+  let match = data.match(errorPattern);
+
+  if (!match) {
+    errorPattern = /APIError: ([\s\S]*?)$/;
+    match = data.match(errorPattern);
+    return match ? `${match[1].trim()} WebSocket will be closed` : data;
+  }
+  return match ? `PERMISSION_DENIED: ${match[1].trim()}.Refresh the screen.` : data;
+};

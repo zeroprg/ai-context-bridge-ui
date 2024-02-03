@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState } from 'react';
-import { setCookie } from './auth';
+import { setCookie, initiateGoogleOAuth } from './auth';
+
+//import { useNavigate } from 'react-router-dom';
 
 interface ErrorProviderProps {
   children: React.ReactNode;
@@ -14,7 +16,8 @@ const ErrorContext = createContext<ErrorContextProps>({ error: null, handleError
 
 export const useError = () => useContext(ErrorContext);
 
-export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
+export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {  
+  //const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
     const handleError = (errorMessage: string, errorObject?: any) => {
     setError(errorMessage);
@@ -22,11 +25,12 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
 
     if (errorObject && isConnectionError(errorObject)) {
       setCookie('sessionId', '', -1);
-      setError(errorObject.code + ' Please refresh the page to log in again.' );
+      setError(errorObject.code + ' Session was lost. Please refresh the page to log in again.' );
+      initiateGoogleOAuth();
     }
   };
 
-  const isConnectionError = (errorObject: any) => {
+  const isConnectionError = (errorObject: any) => {    
     return errorObject.code === 'ERR_NETWORK' || errorObject.code === 'CORS_ERROR';
   };
 

@@ -44,9 +44,9 @@ const MessageBar: React.FC<MessageBarProps> = ({ message, onSend, onLogSend }) =
         try {
             if (selectedFile) {
                 onLogSend(`${selectedFile.name} start uploading......`);
-                const documents:string[] = await prepareFileContent(selectedFile);
+                const documents:string[] = await prepareFileContent(handleError, selectedFile);
                 if (documents.length === 0) {
-                    throw new Error(`Unsupported file type for: ${selectedFile.name} we will support it soon` );
+                    handleError(`Unsupported file type for: ${selectedFile.name} we will support it soon` );
                 }
 
                 // Store index and update filesContent state
@@ -140,7 +140,14 @@ return (
             style={{ display: 'none' }}
             onChange={handleFileChange}
         />
-        <AudioTranscription  onTranscription={(transcript) => console.log(transcript)} />
+        <AudioTranscription 
+            onTranscription={(transcript) => {
+                setMessageText(prevText => prevText ? prevText+" "+ transcript: transcript);
+                adjustTextareaHeight();
+            }} 
+            serverUrl={API_URLS.HttpAudioTranscript}
+        />
+
         <textarea
                 ref={textareaRef}
                 className="message-input"

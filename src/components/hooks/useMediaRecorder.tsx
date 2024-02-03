@@ -19,10 +19,10 @@ export const useMediaRecorder = (
                             const audioData = reader.result?.toString().split(',')[1];
                             if (audioData) {
                                 // Split the audioData into chunks of 2000 characters
-                                const CHUNK_SIZE = 2000;
+                                const CHUNK_SIZE = 5000;
                                 for (let i = 0; i < audioData.length; i += CHUNK_SIZE) {
                                     const chunk = audioData.substring(i, i + CHUNK_SIZE);
-                                    sendJsonMessage({ audio: chunk });
+                                    sendJsonMessage({ audio: `data:audio/ogg; codecs=opus;base64,${chunk}` });
                                 }
                             }
                         };

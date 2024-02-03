@@ -37,7 +37,7 @@ const Home = ({ initiateGoogleOAuth }) => {
                 <img src="/logo512.png" alt="Logo" />
                 <p>Your enterprise solution for document processing by chatting to it</p>
                 <p>
-                    Working with document's formats: *.docx,*.pdf, *.xlsx, *.csv , All image formats: *.jpg,*.png,.. Audio formats are coming:  *.wml,*mp3,*.wave, etc...      
+                    Working with document's formats: .docx, .pdf, .xlsx, .csv , All image formats: .jpg, .png,.. and audio formats: .webm, .ogg, .mp4, .flac, .m4a, .mp3, .mpeg, .mpga, .wav      
                     <a href={aboutLink} target="_blank" rel="noopener noreferrer" className="about-link"> Reference to technical details</a>
                 </p>
 

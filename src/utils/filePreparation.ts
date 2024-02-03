@@ -2,19 +2,15 @@
 import { getDocument } from 'pdfjs-dist';
 import * as XLSX from 'xlsx';
 import Tesseract from 'tesseract.js';
-
+import axios from 'axios';
 import PdfToTextConverter from './PdfToTextConverter';
+import { API_URLS } from '../apiConstants';
 
-export async function query(query: string) {
- // const indexId = await getContext();
- // const response = await queryIndex(query);
-  return null;
-}
 
 const TEXT_CONTENT_THRESHOLD = 50; // Percentage
 
+export async function prepareFileContent(handleError:Function, file: File): Promise<string[]> {
 
-export async function prepareFileContent(file: File): Promise<string[]> {
     if (file.type.startsWith('text/')) {
         const text = await prepareTextFileContent(file);
         return [text];
@@ -42,12 +38,17 @@ export async function prepareFileContent(file: File): Promise<string[]> {
     } else if (file.type.startsWith('image/')) {
         // Process image file
         return await processImageFile(file);
-    } else {
-        console.log('Unsupported file type');
+    } else if (file.type.startsWith('video/') || file.type.startsWith('audio/')) {
+        // Process image file
+        return await processAudioFile(handleError, API_URLS.HttpAudioTranscript, file);
+    }
+    else {
+        handleError('Unsupported file type', file.type);
     }
 
     return [];
 }
+
 
 async function processImageFile(file: File): Promise<string[]> {
     try {
@@ -59,6 +60,32 @@ async function processImageFile(file: File): Promise<string[]> {
         return [];
     }
 }
+
+const sendAudioToServer = async (handleError:Function, serverUrl: string, audioFile: File): Promise<any> => {
+    if (audioFile.size > 0) {
+        const fileExtension = audioFile.name.split('.').pop();
+        const formData = new FormData();
+        formData.append('audioFile', audioFile, `audio.${fileExtension}`); // Append file with its extension     
+            const response = await axios.post(serverUrl, formData, { withCredentials: true })                
+            .catch(error => handleError(error.message));
+            return response.data; // Return response data directly
+    } else {
+        handleError("The audio file is empty.");
+    }
+};
+
+// Function to process the audio file, adjusted for async/await usage
+async function processAudioFile(handleError:Function, serverUrl: string, file: File): Promise<string[]> {
+    try {
+        const responseData = await sendAudioToServer(handleError, serverUrl, file);
+        
+        return [responseData]; // Returning the recognized text in an array
+    } catch (error) {
+        handleError('Error processing audio file:', error);
+        return [];
+    }
+}
+
 
 function loadMammothScript(): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -81,7 +108,7 @@ async function prepareExcelCsvFileContent(file: File): Promise<string[]> {
     const workbook = XLSX.read(arrayBuffer, { type: 'buffer' });
     let allSheets: string[] = [];
 
-    workbook.SheetNames.forEach((sheetName: string) => { 
+    workbook.SheetNames.forEach((sheetName: string) => {
         const worksheet = workbook.Sheets[sheetName];
         const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
         const sheetData = {
@@ -102,7 +129,7 @@ async function checkPdfContent(file: File): Promise<{ isImageBased: boolean; tex
     for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i);
         const textContent: any = await page.getTextContent();
-        textContents.push(textContent.items.map((item : any)=> item.str).join(' '));
+        textContents.push(textContent.items.map((item: any) => item.str).join(' '));
 
         if (textContent.items.length > 0) {
             textPagesCount++;
