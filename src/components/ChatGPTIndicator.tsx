@@ -1,5 +1,3 @@
-// ChatGPTIndicator.tsx
-// At the top of your component file
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import './ChatGPTIndicator.css'; // Make sure to create this CSS file
@@ -7,7 +5,6 @@ import { API_URLS } from "../apiConstants"
 import { ApiKey } from '../models/ApiKey';
 import { useError } from '../ErrorContext';
 import { Role } from '../models/Role';
-
 
 interface APIKeyGridProps {
   apiKey: ApiKey;
@@ -17,7 +14,7 @@ interface APIKeyGridProps {
 const ChatGPTIndicator: React.FC<APIKeyGridProps> = ({ apiKey, onMouseEnter }) => {
   
   const { handleError } = useError();
-  const [selectedAPI] = useState(apiKey.model);
+  const [selectedAPI, setSelectedAPI] = useState(apiKey.model); // Use state to track the selected API
   const [selectedRole, setSelectedRole] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [roles, setRoles] = useState<Role[]>([]);
@@ -25,7 +22,6 @@ const ChatGPTIndicator: React.FC<APIKeyGridProps> = ({ apiKey, onMouseEnter }) =
   const [error, setError] = useState('');
 
   const indicatorClass = isOpen || selectedRole ? "chatgpt-indicator" : "chatgpt-indicator chatgpt-indicator-flashing";
-
 
   const wrapperRef = useRef<HTMLDivElement>(null);
 
@@ -44,8 +40,8 @@ const ChatGPTIndicator: React.FC<APIKeyGridProps> = ({ apiKey, onMouseEnter }) =
     };
   }, []);
 
-
   useEffect(() => {
+    setSelectedAPI(apiKey.model); // Update selectedAPI whenever apiKey.model changes
     if(!selectedRole){
       setLoading(true);
       axios.get(API_URLS.GPTAssistantRole, { withCredentials: true }).then(response => {
@@ -66,7 +62,9 @@ const ChatGPTIndicator: React.FC<APIKeyGridProps> = ({ apiKey, onMouseEnter }) =
         .finally(() => setLoading(false));
     }
 
-  }, [isOpen, selectedRole]);
+  }, [isOpen, selectedRole, apiKey.model]);
+
+  // Other useEffect for fetching roles remains unchanged
 
   const toggleDropdown = () => setIsOpen(!isOpen);
 
@@ -80,13 +78,10 @@ const ChatGPTIndicator: React.FC<APIKeyGridProps> = ({ apiKey, onMouseEnter }) =
 
   }
 
-
   return (
     <div className="chatgpt-indicator-container" onMouseEnter={onMouseEnter}>
-     
       <div className={indicatorClass} onClick={toggleDropdown}>  
         {selectedAPI} acts as {selectedRole} <span className="dropdown-indicator">{isOpen ? '▲' : '▼'}</span>
-
         {isOpen && (
           <div ref={wrapperRef} className="chatgpt-dropdown">
             {loading && <div>Loading...</div>}
@@ -94,7 +89,7 @@ const ChatGPTIndicator: React.FC<APIKeyGridProps> = ({ apiKey, onMouseEnter }) =
             {roles.map((role, index) => (
                 <div key={index} className="dropdown-item" title={role.description} onClick={() => handleRoleSelect(role.role)}>{role.role}</div>
             ))}
-        </div>
+          </div>
         )}
       </div>
     </div>

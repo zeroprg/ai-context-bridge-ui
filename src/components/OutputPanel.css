@@ -25,7 +25,7 @@
   
   .output-panel div {
     display: block;
-    color: #008000; /* Classic green color for text */
+    color: white; /*  white color for text */
     background-color: black; 
     font-family: monospace; /* Monospace font for a typical log appearance */
     font-size: larger;
@@ -41,7 +41,7 @@
   /* log styles as needed */
 
   .output-panel div.log {
-    color: #008000; /* Classic green color for text */
+    color: white; /*  white color for text */
     background-color: black; 
     font-family: monospace; /* Monospace font for a typical log appearance */
     font-size: larger;

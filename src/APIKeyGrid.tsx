@@ -1,42 +1,67 @@
-import React from 'react';
-import { useState, useEffect } from 'react';
-import DataGrid ,{ SelectColumn } from 'react-data-grid';
+import React, { useState, useEffect } from 'react';
+import DataGrid, { SelectColumn } from 'react-data-grid';
+import 'react-data-grid/lib/styles.css';
 import { ApiKey } from './models/ApiKey';
-import 'react-data-grid/lib/styles.css'; // or similar path
-
 
 interface APIKeyGridProps {
   apiKeys: ApiKey[];
-  keySelectedId: string; // Assuming you want to track a single selected key ID
-  onRowSelected: (selectedRows: ReadonlySet<string>) => void; // Callback for when rows are selected
+  keySelectedId: string;
+  onRowSelected: (selectedRows: ReadonlySet<string>) => void;
 }
+
 const APIKeyGrid: React.FC<APIKeyGridProps> = ({ apiKeys, keySelectedId, onRowSelected }) => {
-    const [selectedRows, setSelectedRows] = useState<ReadonlySet<string>>(new Set());
-    // useEffect to update selectedRows based on keySelectedId prop
-    useEffect(() => {
-      if (keySelectedId) {
-        setSelectedRows(new Set([keySelectedId]));
-      }
-    }, [keySelectedId]);
+  const [selectedRows, setSelectedRows] = useState<ReadonlySet<string>>(new Set());
+
+  useEffect(() => {
+    // Initialize selection with keySelectedId if it's not disabled
+    const initialRow = apiKeys.find(apiKey => apiKey.keyId === keySelectedId && !apiKey.disabled);
+    if (initialRow) {
+      setSelectedRows(new Set([keySelectedId]));
+    }
+  }, [keySelectedId, apiKeys]);
+
+  const handleSelectedRowsChange = (newSelectedRows: Set<string>) => {
+    // If no rows are selected, clear the selection
+    if (newSelectedRows.size === 0) {
+      setSelectedRows(new Set());
+      onRowSelected(new Set());
+      return;
+    }
+
+    // Extract the latest selected row's key
+    const selectedRowKey = Array.from(newSelectedRows).pop();
+    const selectedRow = apiKeys.find(apiKey => apiKey.keyId === selectedRowKey);
+
+    // Check if the latest selected row is not disabled
+    if (selectedRow && !selectedRow.disabled) {
+      const updatedSelectedRows: ReadonlySet<string> = new Set([selectedRow.keyId]);
+      setSelectedRows(updatedSelectedRows);
+      onRowSelected(updatedSelectedRows);
+    } else {
+      // If the row is disabled, revert to the previous selection
+      onRowSelected(selectedRows);
+    }
+  };
+
   const columns = [
     SelectColumn,
-
     { key: 'name', name: 'Name' },
     { key: 'model', name: 'Model' },
     { key: 'description', name: 'Description' },
-    { key: 'maxContextLength', name: 'Max. Context Length' },
+    { key: 'maxContextLength', name: 'Context Length' },
     { key: 'totalCost', name: 'Total Cost' },
-    { key: 'uri', name: 'URI' },  
- 
-    // Add other columns as needed
+    { key: 'uri', name: 'URI' },
+    // Define other columns as needed
   ];
 
-
-  const rowKeyGetter = (row: ApiKey) => {
-    return row.keyId;
-  };
+  const rowKeyGetter = (row: ApiKey) => row.keyId;
 
   return (
+    <div >
+   
+    <h2 style={{ textAlign: 'center', width: '100%' }}>Available APIs to use</h2>
+
+    
     <DataGrid
       
       columns={columns.map(column => ({
@@ -45,28 +70,12 @@ const APIKeyGrid: React.FC<APIKeyGridProps> = ({ apiKeys, keySelectedId, onRowSe
     }))}
 
       rows={apiKeys}
-      selectedRows={selectedRows}
-      onSelectedRowsChange={(newSelectedRows) => {
-        // Extract the latest selected row's key, ensuring it is a string
-        const selectedRowArray = Array.from(newSelectedRows);
-        const latestSelectedRowKey = selectedRowArray.length > 0 
-            ? selectedRowArray[selectedRowArray.length - 1] 
-            : null;
-
-        // Update the selectedRows state
-        if (latestSelectedRowKey) {
-            const latestSelectedRow: ReadonlySet<string> = new Set([latestSelectedRowKey]);
-            setSelectedRows(latestSelectedRow);
-            onRowSelected(latestSelectedRow); // Notify parent component of the selection change
-        } else {
-            setSelectedRows(new Set()); // Empty set when no rows are selected
-        }
-    }}
       rowKeyGetter={rowKeyGetter}
-
+      selectedRows={selectedRows}
+      onSelectedRowsChange={handleSelectedRowsChange}
     />
+    </div>
   );
 };
 
 export default APIKeyGrid;
-

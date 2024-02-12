@@ -43,12 +43,13 @@ const MessageBar: React.FC<MessageBarProps> = ({ message, onSend, onLogSend }) =
     const filePreparation = async (selectedFile: File) => {
         try {
             if (selectedFile) {
+                setIsLoading(true); // Start loading
                 onLogSend(`${selectedFile.name} start uploading......`);
-                const documents:string[] = await prepareFileContent(handleError, selectedFile);
+                const documents:string[] = await prepareFileContent(selectedFile);
                 if (documents.length === 0) {
                     handleError(`Unsupported file type for: ${selectedFile.name} we will support it soon` );
                 }
-
+              
                 // Store index and update filesContent state
                 storeContextDocument(selectedFile.name,  documents);
 
@@ -60,7 +61,7 @@ const MessageBar: React.FC<MessageBarProps> = ({ message, onSend, onLogSend }) =
             }
            // setSelectedFile(null);
         } catch (error: any) {
-            console.error('Error sending message:', error);
+            setIsLoading(false); // End loading
             handleError('' + error + ' ' + error.response?.data.message, error);
         }
     };

@@ -9,7 +9,7 @@ import { API_URLS } from '../apiConstants';
 
 const TEXT_CONTENT_THRESHOLD = 50; // Percentage
 
-export async function prepareFileContent(handleError:Function, file: File): Promise<string[]> {
+export async function prepareFileContent(file: File): Promise<string[]> {
 
     if (file.type.startsWith('text/')) {
         const text = await prepareTextFileContent(file);
@@ -39,14 +39,13 @@ export async function prepareFileContent(handleError:Function, file: File): Prom
         // Process image file
         return await processImageFile(file);
     } else if (file.type.startsWith('video/') || file.type.startsWith('audio/')) {
-        // Process image file
-        return await processAudioFile(handleError, API_URLS.HttpAudioTranscript, file);
+        // Process audio file
+        return await processAudioFile(API_URLS.HttpAudioTranscript, file);
     }
     else {
-        handleError('Unsupported file type', file.type);
+         // eslint-disable-next-line no-throw-literal
+         throw `Unsupported file type:  ${file.type}`;
     }
-
-    return [];
 }
 
 
@@ -57,33 +56,29 @@ async function processImageFile(file: File): Promise<string[]> {
         return [text]; // Returning the recognized text in an array
     } catch (error) {
         console.error('Error processing image file:', error);
-        return [];
+        throw error;
     }
 }
 
-const sendAudioToServer = async (handleError:Function, serverUrl: string, audioFile: File): Promise<any> => {
+const sendAudioToServer = async ( serverUrl: string, audioFile: File): Promise<any> => {
     if (audioFile.size > 0) {
-        const fileExtension = audioFile.name.split('.').pop();
-        const formData = new FormData();
-        formData.append('audioFile', audioFile, `audio.${fileExtension}`); // Append file with its extension     
-            const response = await axios.post(serverUrl, formData, { withCredentials: true })                
-            .catch(error => handleError(error.message));
-            return response.data; // Return response data directly
+      const formData = new FormData();
+      formData.append('audioFile', audioFile, audioFile.name); // Append file with its extension
+      try {
+        const response = await axios.post(serverUrl, formData, {withCredentials: true});
+        return response.data; // Return response data directly
+      } catch (error: any) { // Using any here since Axios errors could be of multiple types
+        throw new Error(`${error.message} or file is too big: ${audioFile.size}`);        
+      }
     } else {
-        handleError("The audio file is empty.");
+        throw new Error("The audio file is empty.");
     }
-};
+  };
 
 // Function to process the audio file, adjusted for async/await usage
-async function processAudioFile(handleError:Function, serverUrl: string, file: File): Promise<string[]> {
-    try {
-        const responseData = await sendAudioToServer(handleError, serverUrl, file);
-        
+async function processAudioFile( serverUrl: string, file: File): Promise<string[]> {
+        const responseData = await sendAudioToServer(serverUrl, file);        
         return [responseData]; // Returning the recognized text in an array
-    } catch (error) {
-        handleError('Error processing audio file:', error);
-        return [];
-    }
 }
 
 

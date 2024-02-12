@@ -8,15 +8,16 @@ interface CreateApiKeyFormProps {
 const CreateApiKeyForm: React.FC<CreateApiKeyFormProps> = ({ onCreate }) => {
   const [apiKey, setApiKey] = useState<ApiKey>({
     keyId: '',
+    defaultKey: true,
+    disabled: false,
     keyValue: '',
     name: '',
     uri: '',
     homepage: '',
     userId: '',
-    maxContextLength: 0, // Max context length
+    maxContextLength: 0,
     totalCost: 0,
     publicAccessed: false,
-    defaultKey: true,
     model: '',
     description: '',
   });
