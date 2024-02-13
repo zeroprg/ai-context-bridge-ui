@@ -32,7 +32,7 @@ export async function prepareFileContent(file: File): Promise<string[]> {
 
         // Handle .docx files
         return await prepareDocxFileContent(file);
-    } else if (file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || file.type === 'text/csv') {
+    } else if ( file.type === 'application/msword' || file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || file.type === 'text/csv') {
         // Handle .xlsx and .csv files
         return await prepareExcelCsvFileContent(file);
     } else if (file.type.startsWith('image/')) {
