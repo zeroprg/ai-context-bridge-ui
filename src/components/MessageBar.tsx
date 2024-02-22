@@ -93,7 +93,7 @@ const MessageBar: React.FC<MessageBarProps> = ({ message, onSend, onLogSend }) =
 
     const handleSendClick = async () => {
         setIsLoading(true); // Start loading
-        setMessageText('');
+
         adjustTextareaHeight();
         try {
             const payload = `${messageText}`; ///add prompts here
@@ -102,7 +102,8 @@ const MessageBar: React.FC<MessageBarProps> = ({ message, onSend, onLogSend }) =
         } catch (error: any) {
             handleError('' + error + ' ' + error.response?.data.message, error);
         } finally {
-            setIsLoading(false); // End loading           
+            setIsLoading(false); // End loading        
+            setMessageText('');   
         }
     };
 

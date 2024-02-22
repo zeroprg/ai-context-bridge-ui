@@ -1,0 +1,36 @@
+.VPSwitch {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 25px;
+    transition: background-color 0.3s ease;
+}
+
+.VPSwitchAppearance {
+    background-color: #f0f0f0; /* Light mode background */
+    border: 2px solid #dcdcdc; /* Light mode border */
+}
+
+.VPSwitch.dark {
+    background-color: #333; /* Dark mode background */
+    border: 2px solid #444; /* Dark mode border */
+}
+
+.VPSwitch.light {
+    background-color: #f0f0f0; /* Light mode background */
+    border: 2px solid #dcdcdc; /* Light mode border */
+}
+
+.sun, .moon {
+    fill: currentColor;
+}
+
+.sun {
+    color: #ffd700; /* Sun icon color */
+}
+
+.moon {
+    color: black; /* Moon icon color */
+}

@@ -1,0 +1,15 @@
+/* AudioPlayer.css */
+.small-icon {
+    font-size: 12px; /* Smaller icon */
+  }
+  
+  .small-text {
+    color: var(--primary-color);
+    font-size: 8px; /* Smaller text */
+  }
+  
+  .small-audio {
+    color: var(--primary-text-color);
+    width: 50px; /* Smaller audio control */
+    height: 20px; /* Adjust height if necessary */
+  }  

@@ -26,10 +26,10 @@ export const API_URLS = {
     StripeCheckout: `${BASE_URL}/stripepayment/create-checkout-session`,
     //WsTransript: `${BASE_URL}/topic/transcription`,
     //WsAudio: `${WS_BASE_URL}/ws/audio`,
-    HttpAudioTranscript: `${BASE_URL}/api/v1/transcription`
+    HttpAudioTranscript: `${BASE_URL}/api/v1/transcription`,
+    TTS: (voice: string) =>`${BASE_URL}/api/v1/tts?voice=${voice}`,
 
 };
 
 export const CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
 export const BACKEND_REDIRECT_URI = process.env.REACT_APP_BACKEND_REDIRECT_URI;
- 

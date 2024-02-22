@@ -13,6 +13,7 @@ import OutputPanel from './components/OutputPanel';
 import { useUser } from './components/UserContext';
 import { useError } from './ErrorContext';
 import ChatGPTIndicator from './components/ChatGPTIndicator';
+import ModeSwitch from './components/ModeSwitch';
 
 interface APIProps {
   message: string;
@@ -117,7 +118,7 @@ const API: React.FC<APIProps> = ({ message }) => {
     <div className="api-container">
       <OutputPanel message={queryResult} logMessage={logMessage}/>         
       <MessageBar message={prompt} onSend={handleQueryResult} onLogSend={handleTechnicalMessage} />
-
+      <ModeSwitch/>
     </div>
 
 
