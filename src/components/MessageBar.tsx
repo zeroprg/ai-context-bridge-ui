@@ -133,7 +133,7 @@ return (
     <div className="message-bar">
         {/* File icons and names with hover content */}
         <label htmlFor="file-upload">
-            <AiOutlinePaperClip className="attachment-icon" />
+            <AiOutlinePaperClip style={{ color: 'green', fontSize: '28px' }}  />
         </label>       
         <input
             type="file"
@@ -163,9 +163,9 @@ return (
                 onKeyPress={handleKeyPress}
         />
             {isLoading ? (
-                <AiOutlineLoading3Quarters className="message-icon loading" />
+                <AiOutlineLoading3Quarters className="loading"  style={{ color: 'green', fontSize: '28px' }} />
             ) : (
-                <AiOutlineArrowUp className="message-icon" onClick={handleSendClick} />
+                <AiOutlineArrowUp  style={{ color: 'green', fontSize: '28px' }} onClick={handleSendClick} />
             )}
 
         </div>

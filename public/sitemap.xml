@@ -2,11 +2,11 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <!-- Allowed URLs -->
     <url>
-        <loc>https://tothemoon.chat:8443/</loc>
+        <loc>https://tothemoon.chat:8080/</loc>
         <changefreq>weekly</changefreq>
     </url>
     <url>
-        <loc>https://tothemoon.chat:8443/swagger-ui/index.html</loc>
+        <loc>https://tothemoon.chat:8080/swagger-ui/index.html</loc>
         <changefreq>weekly</changefreq>
     </url>
     <url>

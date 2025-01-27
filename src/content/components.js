@@ -73,7 +73,7 @@ export const Pricing = () => (
  // Footer.js
 export const Footer = () => (
     <footer className="footer">
-      <p>© 2024 API ToTheMoon</p>
+      <p>© 2024 API Bloberry Consulting</p>
       {/* Additional footer content */}
     </footer>
   );

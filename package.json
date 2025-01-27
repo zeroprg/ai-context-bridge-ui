@@ -14,11 +14,14 @@
     "@types/react": "^18.2.42",
     "@types/react-dom": "^18.2.17",
     "axios": "^1.6.2",
+    "file-saver": "^2.0.5",
     "jspdf": "^2.5.1",
     "lodash": "^4.17.21",
     "mammoth": "^1.6.0",
+    "openai": "^4.78.1",
     "pdfjs-dist": "^4.0.379",
     "react": "^18.2.0",
+    "react-chatbotify": "^2.0.0-beta.26",
     "react-data-grid": "^7.0.0-beta.41",
     "react-dom": "^18.2.0",
     "react-icons": "^4.12.0",
@@ -34,7 +37,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build && npm run uglify",
-    "uglify": "mkdir -p ./prod_build && cp -R ./build/* ./prod_build/ && rm -rf ./prod_build/static/js && uglifyjs-folder ./build/static/js -eo ./prod_build/static/js",
+    "uglify": "mkdir -p ./prod_build && cp -R ./build/* ./prod_build/ && rm -rf ./prod_build/static/js && npx uglifyjs-folder ./build/static/js -eo ./prod_build/static/js",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -58,6 +61,7 @@
   },
   "devDependencies": {
     "@types/lodash": "^4.14.202",
-    "@types/react-onclickoutside": "^6.7.8"
+    "@types/react-onclickoutside": "^6.7.8",
+    "uglifyjs-folder": "^3.3.0"
   }
 }

@@ -1,17 +1,8 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import axios from 'axios';
 import { AiOutlineAudio } from 'react-icons/ai';
-import { useError } from '../ErrorContext'; 
-/**
- * `AudioTranscription` is a React component that provides audio recording functionality.
- * It allows users to click a button to start/stop recording.
- *
- * Props:
- * - `onTranscription`: A callback function that is called with the transcription result.
- *
- * State:
- * - `isRecording`: Boolean state indicating whether recording is active.
- */
+import { useError } from '../ErrorContext';
+
 interface AudioTranscriptionProps {
   onTranscription: (transcript: string) => void;
   serverUrl: string;
@@ -21,123 +12,207 @@ const AudioTranscription: React.FC<AudioTranscriptionProps> = ({ onTranscription
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const audioChunks = useRef<Blob[]>([]);
-  const sendInterval = useRef<number | null>(null);
   const isRecordingRef = useRef(isRecording);
-
-
+  const streamRef = useRef<MediaStream | null>(null);
   const { handleError } = useError();
 
-  const mimeTypeToExtension: { [key: string]: string } = {
-    "audio/webm;codecs=opus": ".webm",
-    "audio/webm": ".webm",
-    "audio/ogg;codecs=opus": ".ogg",
-    "audio/mp4": ".mp4",
-    "audio/ogg": ".ogg",
-    "audio/flac": ".flac",
-    "audio/x-m4a": ".m4a",
-    "audio/mp3": ".mp3",
-    "audio/mpeg": ".mpeg",
-    "audio/mpga": ".mpga",
-    "audio/wav": ".wav",
-};
+  // Audio analysis refs
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const checkIntervalRef = useRef<number | null>(null);
+  const silenceTimeoutRef = useRef<number | null>(null);
+  const lastLoudTimeRef = useRef<number>(0);
+  const isProcessingRef = useRef(false); // Add processing lock
 
-// Function to select a supported mime type
-  const getSupportedMimeType = useCallback(() => {
-    const types = Object.keys(mimeTypeToExtension);
-    return types.find(type => MediaRecorder.isTypeSupported(type)) || "";
+  // Configuration
+  const SILENCE_THRESHOLD = 10;
+  const MIN_AUDIO_DURATION = 0.5;
+  const DEBOUNCE_TIME = 500;
+
+  const mimeType = useCallback(() => {
+    const types = [
+      "audio/webm;codecs=opus",
+      "audio/webm",
+      "audio/ogg;codecs=opus",
+      "audio/mp4",
+      "audio/mpeg"
+    ];
+    return types.find(MediaRecorder.isTypeSupported) || "";
+  }, [])();
+
+  const cleanupResources = useCallback(() => {
+    if (checkIntervalRef.current) clearInterval(checkIntervalRef.current);
+    if (silenceTimeoutRef.current) clearTimeout(silenceTimeoutRef.current);
+    if (audioContextRef.current) audioContextRef.current.close();
+    
+    checkIntervalRef.current = null;
+    silenceTimeoutRef.current = null;
+    analyserRef.current = null;
+    audioContextRef.current = null;
+    
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
   }, []);
 
-  const mimeType = getSupportedMimeType();
-  const fileExtension = mimeTypeToExtension[mimeType] || '.webm';
-
   const initializeRecorder = useCallback(async () => {
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      handleError("getUserMedia is not supported in this browser.");
-      return;
-    }
+    cleanupResources();
+    isProcessingRef.current = false;
     
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const newRecorder = new MediaRecorder(stream, { mimeType });
-      newRecorder.ondataavailable = event => {
+      streamRef.current = stream;
+
+      audioContextRef.current = new AudioContext();
+      const source = audioContextRef.current.createMediaStreamSource(stream);
+      analyserRef.current = audioContextRef.current.createAnalyser();
+      analyserRef.current.fftSize = 2048;
+      source.connect(analyserRef.current);
+
+      mediaRecorder.current = new MediaRecorder(stream, { mimeType });
+      
+      mediaRecorder.current.ondataavailable = async (event) => {
         if (event.data.size > 0) {
           audioChunks.current.push(event.data);
         }
-      };
-      // Clear existing chunks to ensure a fresh start for new recording
-      audioChunks.current = [];
-      newRecorder.start(3000); // Collect data every 3 seconds
-      mediaRecorder.current = newRecorder;
-    } catch (error) {
-      handleError(`Error accessing the microphone: ${error}`);
-    }
-  }, [handleError, mimeType]);
-  
 
-  const sendAudioToServer = useCallback(() => {
-    if (audioChunks.current.length === 0) {
-      return;
-    }
-    const audioBlob = new Blob(audioChunks.current, { type: mimeType });
-    const formData = new FormData();
-    formData.append('audioFile', audioBlob, `audio${fileExtension}`);
-    axios.post(serverUrl, formData, { withCredentials: true })
-      .then(response => {
-        onTranscription(response.data);
-        audioChunks.current = []; // Clear the chunks after sending
-        const currentIsRecording = isRecordingRef.current;
-        if (currentIsRecording) {
-          if (mediaRecorder.current) {
-            mediaRecorder.current.stop();
-            mediaRecorder.current = null;
-          } 
-          initializeRecorder(); // Re-initialize the recorder for the next chunk
+        // Only process when recorder is inactive
+        if (mediaRecorder.current?.state === 'inactive' && !isProcessingRef.current) {
+          isProcessingRef.current = true;
+          const shouldSend = await validateAudioDuration();
+          
+          if (shouldSend) {
+            await sendAudioToServer();
+          }
+          
+          audioChunks.current = [];
+          isProcessingRef.current = false;
+          
+          if (isRecordingRef.current) {
+            initializeRecorder();
+          }
         }
-      })
-      .catch(error => handleError(error.message));
-      
-  }, [serverUrl, onTranscription, handleError, fileExtension, mimeType, initializeRecorder]);
+      };
 
-  const startRecording = useCallback(() => { 
+      mediaRecorder.current.start();
+      lastLoudTimeRef.current = Date.now();
+
+      // Start audio monitoring
+      checkIntervalRef.current = window.setInterval(analyzeAudio, 100);
+    } catch (error) {
+      handleError(`Microphone error: ${error}`);
+    }
+  }, [mimeType, handleError, cleanupResources]);
+
+  const analyzeAudio = useCallback(() => {
+    if (!analyserRef.current) return;
+
+    const dataArray = new Uint8Array(analyserRef.current.fftSize);
+    analyserRef.current.getByteTimeDomainData(dataArray);
+
+    let max = 0;
+    for (let i = 0; i < dataArray.length; i++) {
+      const value = Math.abs(dataArray[i] - 128);
+      if (value > max) max = value;
+    }
+
+    if (max > SILENCE_THRESHOLD) {
+      lastLoudTimeRef.current = Date.now();
+      if (silenceTimeoutRef.current) {
+        clearTimeout(silenceTimeoutRef.current);
+        silenceTimeoutRef.current = null;
+      }
+    } else {
+      const silenceDuration = Date.now() - lastLoudTimeRef.current;
+      if (silenceDuration >= 2000 && !silenceTimeoutRef.current) {
+        silenceTimeoutRef.current = window.setTimeout(() => {
+          if (mediaRecorder.current?.state === 'recording') {
+            mediaRecorder.current.requestData();
+            mediaRecorder.current.stop();
+          }
+          silenceTimeoutRef.current = null;
+        }, DEBOUNCE_TIME);
+      }
+    }
+  }, []);
+
+  const validateAudioDuration = async () => {
+    if (audioChunks.current.length === 0) return false;
+    
+    try {
+      const blob = new Blob(audioChunks.current, { type: mimeType });
+      const arrayBuffer = await blob.arrayBuffer();
+      const duration = await new Promise<number>((resolve) => {
+        const audioContext = new AudioContext();
+        audioContext.decodeAudioData(arrayBuffer, (buffer) => {
+          audioContext.close();
+          resolve(buffer.duration);
+        }, () => {
+          audioContext.close();
+          resolve(0);
+        });
+      });
+      return duration >= MIN_AUDIO_DURATION;
+    } catch {
+      return false;
+    }
+  };
+
+  const sendAudioToServer = useCallback(async () => {
+    if (audioChunks.current.length === 0) return;
+
+    try {
+      const blob = new Blob(audioChunks.current, { type: mimeType });
+      const formData = new FormData();
+      formData.append('audioFile', blob, `recording_${Date.now()}.webm`);
+      
+      const response = await axios.post(serverUrl, formData, { withCredentials: true });
+      onTranscription(response.data);
+    } catch (error) {
+      handleError(error instanceof Error ? error.message : 'Upload failed');
+    }
+  }, [serverUrl, onTranscription, handleError, mimeType]);
+
+  const startRecording = useCallback(() => {
     setIsRecording(true);
     isRecordingRef.current = true;
     initializeRecorder();
-    clearInterval(sendInterval.current ?? 0);
-    sendInterval.current = window.setInterval(sendAudioToServer, 60 * 500); // Send audio every 0.5 minute
-  }, [initializeRecorder, sendAudioToServer]);
+  }, [initializeRecorder]);
 
   const stopRecording = useCallback(() => {
     setIsRecording(false);
     isRecordingRef.current = false;
-    if (mediaRecorder.current) {
+
+    if (mediaRecorder.current?.state === 'recording') {
+      mediaRecorder.current.requestData();
       mediaRecorder.current.stop();
-      mediaRecorder.current = null;
-    }    
-    sendAudioToServer(); // Send the last chunk of audio
-    clearInterval(sendInterval.current ?? 0);
-    sendInterval.current = null;
-  }, [sendAudioToServer]);
+    }
+
+    cleanupResources();
+  }, [cleanupResources]);
 
   useEffect(() => {
     return () => {
-      if (sendInterval.current !== null) {
-        clearInterval(sendInterval.current);
+      cleanupResources();
+      if (mediaRecorder.current?.state === 'recording') {
+        mediaRecorder.current.stop();
       }
     };
-  }, []);
+  }, [cleanupResources]);
 
   const toggleRecording = useCallback(() => {
-    if (isRecording) {      
-      stopRecording();
-    } else {
-      startRecording();
-    }
-  }, [stopRecording, startRecording, isRecording]);
+    isRecording ? stopRecording() : startRecording();
+  }, [isRecording, startRecording, stopRecording]);
 
   return (
     <div>
       <label onClick={toggleRecording} className={isRecording ? 'recording' : ''}>
-        {isRecording ? <AiOutlineAudio style={{ color: 'green', fontSize: '48px' }} /> : <AiOutlineAudio  className='attachment-icon'/>}
+        {isRecording ? (
+          <AiOutlineAudio style={{ color: 'red', fontSize: '48px' }} />
+        ) : (
+          <AiOutlineAudio style={{ color: 'green', fontSize: '28px' }} />
+        )}
       </label>
       <input type="checkbox" style={{ display: 'none' }} checked={isRecording} readOnly />
     </div>

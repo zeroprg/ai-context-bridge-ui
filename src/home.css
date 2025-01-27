@@ -1,43 +1,242 @@
+/* home.css */
+
+/* General Styles */
+body {
+  font-family: 'Arial', sans-serif;
+  color: var(--primary-text-color);
+  background-color: var(--background-color);
+  margin: 0;
+  padding: 10px;
+  min-height: 100vh;
+  box-sizing: border-box; /* Ensure padding is included in width calculations */
+}
+
+/* App Specific Styles */
+.App {
+  text-align: center;
+  background: var(--background-color);
+  min-height: 100vh;
+  padding: 10px;
+  box-sizing: border-box; /* Ensure padding is included in width calculations */
+}
+
+.App-header {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 10px;
+  background: transparent;
+  border-radius: 10px;
+  box-shadow: var(--box-shadow);
+  box-sizing: border-box; /* Ensure padding is included in width calculations */
+}
+
+.logo {
+  width: 80px;
+  margin-bottom: 10px;
+}
+
+.title {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  color: var(--primary-color);
+  padding: 0 10px; /* Add padding to prevent text overflow */
+  word-wrap: break-word; /* Break long words to prevent overflow */
+}
+
+.description-box {
+  background: transparent;
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  box-sizing: border-box; /* Ensure padding is included in width calculations */
+}
+
+.description-box p {
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+  line-height: 1.4; /* Improve readability */
+  padding: 0 10px; /* Add padding to prevent text overflow */
+  word-wrap: break-word; /* Break long words to prevent overflow */
+}
+
+/* Fancy Features Box */
+.features-box {
+  text-align: left; /* Align text to the left */
+  padding: 0 10px; /* Add padding to prevent text overflow */
+}
+
+.feature-item {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05)); /* Gradient background */
+  margin: 10px 0;
+  padding: 15px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  color: var(--primary-text-color);
+  line-height: 1.4; /* Improve readability */
+  word-wrap: break-word; /* Break long words to prevent overflow */
+  width: 100%; /* Ensure list items take full width */
+  box-sizing: border-box; /* Ensure padding is included in width calculations */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle box shadow */
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth hover effect */
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Space between icon and text */
+}
+
+.feature-item:hover {
+  transform: translateY(-5px); /* Lift effect on hover */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Enhanced shadow on hover */
+}
+
+.feature-icon {
+  font-size: 1.2rem; /* Icon size */
+  color: var(--primary-color); /* Icon color */
+}
+
+/* Buttons */
+.fancy-button {
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.9rem;
+  background: var(--button-gradient);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  margin: 5px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: var(--box-shadow);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  word-wrap: break-word; /* Break long words to prevent overflow */
+}
+
+.fancy-button:hover {
+  transform: translateY(-2px);
+  background: var(--button-gradient-hover);
+}
+
+.run-button {
+  background: var(--run-button-gradient);
+}
 
 .google-signin-btn {
-    font-family: 'Roboto', sans-serif;
-    font-size: 16px;
-    background-color: #FFFFFF;
-    color: #5F6368;
-    border: 1px solid #DADCE0;
-    padding: 0 24px;
-    margin: 10px;
-    height: 58px;
-    line-height: 48px;
-    border-radius: 24px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 1px 3px 0 rgba(0,0,0,0.3);
-    transition: background-color 0.218s, border-color 0.218s, box-shadow 0.218s;
+  background: var(--google-button-gradient);
+  color: white;
+  border: 1px solid #DADCE0;
+  padding: 0 16px;
+  height: 48px;
+  line-height: 40px;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+  transition: background-color 0.218s, border-color 0.218s, box-shadow 0.218s;
+  word-wrap: break-word; /* Break long words to prevent overflow */
 }
 
 .google-signin-btn:hover {
-    box-shadow: 0 2px 6px 0 rgba(66,133,244,0.6);
+  box-shadow: 0 2px 6px 0 rgba(66, 133, 244, 0.6);
 }
 
 .google-signin-btn:focus {
-    outline: none;
-    box-shadow: 0 0 3px 3px rgba(66,133,244,0.5);
+  outline: none;
+  box-shadow: 0 0 3px 3px rgba(66, 133, 244, 0.5);
 }
 
 .google-signin-btn:active {
-    background-color: #E8EAED;
+  background-color: #E8EAED;
 }
 
 .google-signin-btn-icon {
-    background: url('https://developers.google.com/identity/images/g-logo.png') transparent 5px 50% no-repeat;
-    height: 38px;
-    width: 38px;
-    margin-right: 24px;
+  background: url('https://developers.google.com/identity/images/g-logo.png') transparent 5px 50% no-repeat;
+  height: 30px;
+  width: 30px;
+  margin-right: 16px;
 }
 
 .google-signin-btn-text {
-    font-weight: 500;
+  font-weight: 500;
+}
+
+/* Language Selection */
+.language-selection {
+  margin: 10px 0;
+}
+
+.language-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 5px;
+}
+
+.language-button {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: var(--primary-text-color);
+  font-size: 0.8rem;
+  padding: 6px 12px;
+  word-wrap: break-word; /* Break long words to prevent overflow */
+}
+
+.language-button.active {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+/* Video Gallery */
+.video-tutorials-text {
+  font-size: 1rem;
+  margin: 10px 0;
+  color: var(--primary-text-color);
+  padding: 0 10px; /* Add padding to prevent text overflow */
+  word-wrap: break-word; /* Break long words to prevent overflow */
+}
+
+.video-gallery {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.video-thumbnail {
+  text-decoration: none;
+  color: white;
+  flex: 1 1 45%; /* Allow thumbnails to wrap and take up 45% of the width */
+  max-width: 160px;
+}
+
+.thumbnail-image {
+  border-radius: 10px;
+  transition: transform 0.3s ease;
+  width: 100%;
+  height: auto;
+}
+
+.thumbnail-image:hover {
+  transform: scale(1.05);
+}
+
+/* About Link */
+.about-link-text {
+  font-size: 0.9rem;
+  color: var(--primary-text-color);
+  padding: 0 10px; /* Add padding to prevent text overflow */
+  word-wrap: break-word; /* Break long words to prevent overflow */
+}
+
+.about-link {
+  color: var(--primary-color);
+  text-decoration: none;
+  margin-left: 5px;
+}
+
+.about-link:hover {
+  text-decoration: underline;
 }
