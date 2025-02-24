@@ -15,7 +15,7 @@ import SandingBox from './SandingBox';
 import AudioTranscription from './AudioTranscription';
 
 // Set the workerSrc to the path of the pdf.worker.js
-pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.mjs`;
+pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs`;
 
 const PROMT_GENERATION_QUERY = 'Based on uploaded text generate prompt questions. Show only list of questions. Ask to draw it as table.';
 type MessageBarProps = {

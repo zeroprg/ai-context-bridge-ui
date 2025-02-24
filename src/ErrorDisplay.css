@@ -1,0 +1,11 @@
+
+/* ErrorDisplay.css */
+
+.error-boundary {
+  padding: 20px;
+  background-color: var(--background-color);
+  color: var(--primary-text-color);
+  border: 2px solid var(--error-color); /* Border color for errors */
+  border-radius: 10px;
+  box-shadow: var(--box-shadow); /* Use theme variable */
+}

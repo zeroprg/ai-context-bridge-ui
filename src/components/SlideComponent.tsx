@@ -1,11 +1,7 @@
 import React, { useState, useEffect, CSSProperties } from 'react';
-
 import axios from 'axios';
-import { AiOutlineAccountBook, AiOutlineDelete } from 'react-icons/ai';
-
-//import './MessageBar.css'; // Make sure this CSS file exists
-import { FaArrowLeft, FaArrowRight, FaUser, FaCreditCard, FaEnvelope } from 'react-icons/fa'; // Import icons
-
+import { MdMenu, MdClose, MdChatBubbleOutline, MdDeleteOutline } from 'react-icons/md';
+import { FaUser, FaCreditCard, FaEnvelope } from 'react-icons/fa';
 import { useUser } from './UserContext';
 import { storeContext } from "../utils/llama";
 import './SlideComponent.css';
@@ -21,61 +17,38 @@ interface SlideComponentProps {
 
 const SlideComponent: React.FC<SlideComponentProps> = ({ onSend }) => {
   const { user, setUser } = useUser();
-  // State to hold contexts
   const [groupedContexts, setGroupedContexts] = useState<Record<string, Context[]>>({});
   const { handleError } = useError();
   const [isOpen, setIsOpen] = useState(false);
   const [buttonHint, setButtonHint] = useState("More info");
 
-  //const navigate = useNavigate();    
-
-  const toggleButtonStyle: CSSProperties = {
-    position: 'fixed',
-    left: isOpen ? '250px' : '0px',
-    top: '50%',
-    transform: 'translateY(-50%)',
-    background: 'var(--primary-bg-color)', // Use variable for background color
-    color: 'var(--primary-text-color)', // Use variable for icon/text color
-    border: 'none',
-    cursor: 'pointer',
-    zIndex: 1001,
-    transition: 'transform 0.3s ease-in-out',
-  };
-
-
-  /*
-    const navigateToAddAPI = () => {
-      navigate("/add-api");
-    };
-  */
   const toggleOpen = () => {
     setIsOpen(!isOpen);
     setButtonHint(isOpen ? "More info" : "Hide Info");
   };
 
-  // Function to format date
+  // Added to close the sidebar explicitly (for mobile or on context selection)
+  const closeSidebar = () => {
+    setIsOpen(false);
+    setButtonHint("More info");
+  };
+
   const formatDate = (date: Date) => {
     return date.toLocaleDateString('en-US', {
       year: 'numeric', month: 'long', day: 'numeric'
     });
   };
 
-
   useEffect(() => {
     const contexts: Record<string, Context> = (user as any)?.contexts || {};
     const groups: Record<string, Context[]> = {};
-
     Object.values(contexts).forEach((context) => {
-      const dateKey = context.lastUsed
-        ? formatDate(new Date(context.lastUsed))
-        : 'Unknown';
-
+      const dateKey = context.lastUsed ? formatDate(new Date(context.lastUsed)) : 'Unknown';
       groups[dateKey] = groups[dateKey] || [];
       groups[dateKey].push(context);
     });
-
     setGroupedContexts(groups);
-  }, [user]); // Dependency array includes 'user'
+  }, [user]);
 
   const processConversationHistory = (conversationHistoryStr: string) => {
     if (conversationHistoryStr) {
@@ -85,14 +58,13 @@ const SlideComponent: React.FC<SlideComponentProps> = ({ onSend }) => {
         if (Array.isArray(conversationHistory)) {
           let messageText = '';
           conversationHistory.forEach(message => {
-
             if (message.role === 'system') {
               assistantRole = message.content;
-
             } else {
-              if (message.role === 'assistant') messageText += `${assistantRole}: ${message.content}\n`;
-              else if (message.role === 'user') messageText += `You: ${message.content}\n`;
-
+              if (message.role === 'assistant')
+                messageText += `${assistantRole}: ${message.content}\n`;
+              else if (message.role === 'user')
+                messageText += `You: ${message.content}\n`;
             }
           });
           onSend('$clearOutputPanel');
@@ -104,26 +76,22 @@ const SlideComponent: React.FC<SlideComponentProps> = ({ onSend }) => {
     }
   };
 
-
   const handleRemoveFile = (fileName: string) => {
-    // Remove file from context
-    axios.delete(API_URLS.DeleteFileFromContext(fileName), { withCredentials: true }).then(response => {
-      setUser(response.data);
-    })
-      .catch(error => { handleError('' + error + ' ' + error.response?.data.message, error); })
-  }
+    axios.delete(API_URLS.DeleteFileFromContext(fileName), { withCredentials: true })
+      .then(response => { setUser(response.data); })
+      .catch(error => { handleError('' + error + ' ' + error.response?.data.message, error); });
+  };
 
+  // When a context is selected, show it and then close the sidebar.
   const handleShowContext = (context: Context) => {
     console.log("handleShowContext called", context.name);
-    // loop over context's conversationHistory and send each message to onSend  
-    context.conversationHistory && processConversationHistory(context.conversationHistory);
-    //  onSend(`You: ${messageText} \n ${response.data}`);
-    storeContext(context)
-  }
+    if (context.conversationHistory) {
+      processConversationHistory(context.conversationHistory);
+    }
+    storeContext(context);
+    closeSidebar(); // Close sidebar upon selection.
+  };
 
-  const handleShowFile = (documents: string[]) => {
-    console.log("handleShowFile called", documents);
-  }
   const updateUserCredit = (amountPaid: number) => {
     if (user) {
       const updatedUser = { ...user, credit: user.credit - amountPaid };
@@ -133,106 +101,102 @@ const SlideComponent: React.FC<SlideComponentProps> = ({ onSend }) => {
 
   const handlePaymentConfirmation = (sessionId: string, amountPaid: number) => {
     console.log('Payment confirmed for session:', sessionId);
-    // Since we're simulating without a server, we'll assume the session ID is valid
-    // In a real application, this should be verified server-side
-    const isSessionValid = true; // Placeholder for actual validation
+    const isSessionValid = true;
     if (isSessionValid) {
-      // Update user interface or state to reflect the successful payment
       updateUserCredit(amountPaid);
-      // Any other client-side updates based on the assumed successful payment
     } else {
-      // Handle the case where session ID is not valid
       console.error('Payment session could not be verified');
     }
   };
 
-
   return (
     <>
       <div className={`sidebar ${isOpen ? 'open' : ''}`}
-        onMouseEnter={() => setIsOpen(true)}
-        onMouseLeave={() => setIsOpen(false)}>
+           onMouseEnter={() => setIsOpen(true)}
+           onMouseLeave={() => setIsOpen(false)}>
         <div className="sidebar-header">
+          {/* Mobile close button, visible only on small screens */}
+          <div className="mobile-close-button">
+            <button onClick={closeSidebar}>
+              <MdClose size={24} />
+            </button>
+          </div>
           <h3>API Management</h3>
-
-          {/* Displaying grouped contexts */}
-
-          {groupedContexts &&
-            <div>
+          {groupedContexts && Object.keys(groupedContexts).length > 0 && (
+            <div className="contexts-section">
               <h3>My Previous Contexts</h3>
               {Object.entries(groupedContexts).map(([date, contexts]) => (
-                <div key={date}>
+                <div key={date} className="context-group">
                   <h4>{date}</h4>
-                  <ul>
+                  <div className="contexts-list">
                     {contexts.map((context, id) => (
-                      <li key={id} style={{ cursor: 'pointer' }}>
-                        <div className='hover-file-content-tooltip' role="button" tabIndex={0} title="Click it to select as current context">
+                      <div key={id} className="context-card">
+                        <div className="context-details"
+                             title="Click to view context"
+                             onClick={() => handleShowContext(context)}>
                           <span className={context.sessionId === getCookie('sessionId') ? 'green-text' : ''}>
                             {context.name}
                           </span>
-
-                          <AiOutlineAccountBook
-                            className="delete-file-icon" title="Click it to show chat history"
-                            onClick={() => handleShowContext(context)}
-                          />
-
-                          <AiOutlineDelete
-                            className="delete-file-icon"
-                            onClick={() => handleRemoveFile(context.name)}
-                          />
-
-                          {context.documents &&
-
-                            <div className="file-content-tooltip2">
-                              {context.documents.join("\n ----- Next Document------ \n")}
-                            </div>
-
-                          }
+                          {context.conversationHistory && (
+                            <p className="context-snippet">
+                              {(() => {
+                                try {
+                                  const parsed = JSON.parse(context.conversationHistory);
+                                  if (Array.isArray(parsed) && parsed.length > 0) {
+                                    const snippet = parsed.map((msg: any) => msg.content).join(' ');
+                                    return snippet.substring(0, 50) + '...';
+                                  }
+                                } catch (error) {
+                                  return '';
+                                }
+                                return '';
+                              })()}
+                            </p>
+                          )}
                         </div>
-                      </li>
+                        <div className="context-actions">
+                          <MdChatBubbleOutline className="context-icon" title="View chat history" onClick={() => handleShowContext(context)} />
+                          <MdDeleteOutline className="context-icon" title="Delete context" onClick={() => handleRemoveFile(context.name)} />
+                        </div>
+                      </div>
                     ))}
-                  </ul>
-
+                  </div>
                 </div>
               ))}
             </div>
-          }
-          <h3> API Keys management </h3>
-          {/*<li><a href="#add-api" onClick={navigateToAddAPI}>Add a new API key</a></li>*/}
-          <li><a href="#share-api">Share my API keys</a></li>
-
-
+          )}
+          <h3>API Keys Management</h3>
+          <ul>
+            <li><a href="#share-api">Share my API keys</a></li>
+          </ul>
         </div>
 
         <div className="sidebar-menu">
-
+          {/* Additional sidebar menu content */}
         </div>
 
         <div className="sidebar-footer">
-          {/* Footer Content Here, if any */}
           <div className="user-info">
-
             {user?.pictureLink && <img src={user.pictureLink} alt={user.name} className="user-picture" />}
             <div className="user-details">
-              {user?.name && <p title="User's E-mail"><FaUser className="delete-file-icon" /> {user.name}</p>}
-              {user?.credit && <p title='Credit balance'><FaCreditCard className="delete-file-icon" /> {user.credit}$</p>}
-              {user?.lastLogin && <p title="User's icon"><FaEnvelope className="delete-file-icon" /> {user.email}</p>}
-
+              {user?.name && <p title="User's E-mail"><FaUser className="context-icon" /> {user.name}</p>}
+              {user?.credit && <p title="Credit balance"><FaCreditCard className="context-icon" /> {user.credit}$</p>}
+              {user?.email && <p title="User's email"><FaEnvelope className="context-icon" /> {user.email}</p>}
             </div>
-            <StripePaymentComponent amount={1}/>
-            <StripePaymentComponent amount={3}/>
-            <StripePaymentComponent amount={10}/>
+            <div className="payment-section">
+              <StripePaymentComponent amount={1} />
+              <StripePaymentComponent amount={3} />
+              <StripePaymentComponent amount={10} />
+            </div>
           </div>
-
         </div>
       </div>
-      <div style={toggleButtonStyle} onClick={toggleOpen} title={buttonHint}>
-        {isOpen ? <FaArrowLeft size={30} /> : <FaArrowRight size={30} />}
+
+      <div className="toggle-button" onClick={toggleOpen} title={buttonHint}>
+        {isOpen ? <MdClose size={30} /> : <MdMenu size={30} />}
       </div>
     </>
   );
 };
 
 export default SlideComponent;
-
-

@@ -1,39 +1,46 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { AiOutlineLoading3Quarters } from 'react-icons/ai'; // Import the loading icon
+import { AiOutlineLoading3Quarters } from 'react-icons/ai';
+import './AudioPlayer.css';
 
-// Update the props interface
 interface AudioPlayerProps {
-  endpoint: string; // URL to fetch the audio file
-  textToSpeechText: string; // Text to convert to speech
-  start: boolean; // Control flag for starting the audio fetch
+  endpoint: string;          // URL to fetch the audio file
+  textToSpeechText: string;  // Text to convert to speech
+  start: boolean;            // Control flag to trigger fetching immediately
 }
 
 const AudioPlayer: React.FC<AudioPlayerProps> = ({ endpoint, textToSpeechText, start }) => {
   const [audioSrc, setAudioSrc] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [autoFetch, setAutoFetch] = useState<boolean>(start);
+  const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
-    // Fetch audio if autoFetch is true
     if (autoFetch) {
       fetchAudio();
     }
-  }, [endpoint, textToSpeechText, autoFetch]); // Add textToSpeechText to dependencies array
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [endpoint, textToSpeechText, autoFetch]);
 
-  const selectedVoice = "NOVA"; // This should be dynamic based on user selection or some logic
+  const selectedVoice = "NOVA"; // Replace with dynamic logic if needed
 
   const fetchAudio = () => {
     setIsLoading(true);
     axios.post(endpoint, { data: textToSpeechText }, {
-      params: { voice: selectedVoice }, // Add the selectedVoice as a query parameter
+      params: { voice: selectedVoice },
       withCredentials: true,
       responseType: 'blob'
     })
       .then(response => {
         const blob = new Blob([response.data], { type: 'audio/mp3' });
-        setAudioSrc(URL.createObjectURL(blob));
-        // Set autoFetch to false after successful fetch to disable autoplay in future
+        const url = URL.createObjectURL(blob);
+        setAudioSrc(url);
+        // Force play audio once the src is set
+        setTimeout(() => {
+          if (audioRef.current) {
+            audioRef.current.play().catch(err => console.error("Audio play error:", err));
+          }
+        }, 100);
         setAutoFetch(false);
       })
       .catch(error => {
@@ -45,7 +52,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ endpoint, textToSpeechText, s
   };
 
   const handleIconClick = () => {
-    // Fetch audio on icon click
+    // Trigger a new fetch on right-click if needed
     if (!autoFetch) {
       setAutoFetch(true);
     }
@@ -53,19 +60,20 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ endpoint, textToSpeechText, s
 
   return (
     <>
-      {isLoading && <AiOutlineLoading3Quarters className="message-icon loading" />}
-      {!isLoading &&  (
-        <label className="small-text" onClick={handleIconClick} title="Text to Speech">
+      {isLoading && <AiOutlineLoading3Quarters className="audio-loading-icon" />}
+      {!isLoading && (
+        <label className="audio-icon-label" onClick={handleIconClick} title="Play TTS">
           <i className="fas fa-volume-up"></i>
         </label>
       )}
       {audioSrc && (
         <audio
+          ref={audioRef}
           controls
-          autoPlay={autoFetch}
+          autoPlay
           src={audioSrc}
-          onPlay={() => setAutoFetch(false)} // Disable autoplay after first play
-          style={{ width: 100, display: 'block' }} // Make the audio player small and visible
+          onPlay={() => setAutoFetch(false)}
+          className="small-audio-player"
         />
       )}
     </>

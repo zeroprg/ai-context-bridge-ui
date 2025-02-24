@@ -1,78 +1,66 @@
+/* AddAPI.css */
 .add-api-container {
-    padding: 10px;
-    max-width: 500px; /* Limit max width for larger screens */
-    margin: auto;
-  }
-  
-  .api-form {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .form-group {
-    display: flex;
-    grid-template-columns: 1fr 2fr; /* 1st column for description, 2nd for value */
-    gap: 10px; /* Space between columns */
-    justify-content: space-between; /* Distributes space between elements */
-    align-items: center; /* Aligns items vertically in the center */
-    margin-bottom: 15px; /* Spacing between form groups */
-  }
-
-  .label {
-    text-align: right; /* Align the text to the right for the description */
-    padding-right: 10px; /* Optional spacing */
+  padding: 10px;
+  max-width: 500px;
+  margin: auto;
+  background-color: var(--background-color);
+  color: var(--primary-text-color);
 }
 
+.api-form {
+  display: flex;
+  flex-direction: column;
+}
 
+.form-group {
+  display: flex;
+  grid-template-columns: 1fr 2fr;
+  gap: 10px;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
 
+.label {
+  text-align: right;
+  padding-right: 10px;
+  color: var(--primary-text-color);
+}
 
-  .form-group input,
-  .form-group select,
-  .form-group textarea {
-    /* If you want to ensure that inputs take up the remaining space */
-    flex: 1; 
-    margin-left: 10px; /* Spacing between label and input */
-  }
-  
-  
-  .form-group label {
-    margin-right: 10px; /* Spacing between label and input */
-  }
-  
+.form-group input,
+.form-group select,
+.form-group textarea {
+  flex: 1;
+  margin-left: 10px;
+  background-color: var(--input-bg-color);
+  color: var(--primary-text-color);
+  border: 1px solid var(--box-shadow-color);
+  border-radius: 5px;
+  padding: 10px;
+}
 
-  
-  .form-group input[type="text"],
-  .form-group input[type="number"],
-  .form-group input[type="checkbox"] {
-    width: 100%;
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #ddd;
-  }
-  
-  .submit-btn {
-    padding: 10px 15px;
-    background-color: #4a76a8;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  .submit-btn:hover {
-    background-color: #3674a2;
-  }
-  
-  /* Responsive adjustments */
-  @media (max-width: 600px) {
-    .add-api-container {
+.submit-btn {
+  padding: 10px 15px;
+  background-color: var(--primary-color);
+  color: var(--icon-color);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.submit-btn:hover {
+  background-color: var(--primary-color-hover);
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .add-api-container {
       padding: 5px;
-    }
-  
-    .form-group input[type="text"],
-    .form-group input[type="number"] {
-      padding: 8px;
-    }
   }
-  
+
+  .form-group input[type="text"],
+  .form-group input[type="number"] {
+      padding: 8px;
+  }
+}  
   

@@ -1,0 +1,11 @@
+/* AudioTranscription.css */
+.speaker-badge {
+  position: absolute;
+  top: -20px;
+  background: rgba(0, 0, 0, 0.7);
+  color: var(--icon-color);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+}

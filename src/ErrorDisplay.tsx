@@ -7,7 +7,7 @@ const ErrorDisplay: React.FC = () => {
   if (!error) return null;
 
   return (
-    <div className='errorDisplay'>
+    <div className='error-boundary'>
       {error}
     </div>
   );

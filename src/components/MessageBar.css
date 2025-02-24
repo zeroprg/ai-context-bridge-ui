@@ -3,51 +3,49 @@
     display: flex;
     align-items: center;
     padding: 10px 20px;
-    background-color: var(--secondary-bg-color);
+    background-color: var(--input-bg-color); /* Better contrast */
     border-radius: 20px;
     color: var(--primary-text-color);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    width: 100%; /* Set the width to 100% */
-    margin-bottom: 10px; /* Adds a little space below the bar */
-
-    overflow: hidden; /* Hide the scrollbar */
-    resize: none; /* Prevent manual resizing */
-    height: auto; /* Initial height */
-    min-height: 20px; /* Minimum height */
+    box-shadow: var(--box-shadow); /* Use theme variable */
+    width: 100%;
+    margin-bottom: 10px;
+    overflow: hidden;
+    resize: none;
+    height: auto;
+    min-height: 40px; /* More practical minimum height */
+    border: 1px solid var(--box-shadow-color); /* Added border */
 }
-
 
 .attachment-icon {
     font-size: 20px;
     cursor: pointer;
-    margin-right: 10px; /* Space between icon and input */
-    color: var(--icon-color);
+    margin-right: 10px;
+    color: var(--primary-color); /* Use primary color instead of icon color */
 }
 
 .message-input {
     flex-grow: 1;
     margin-right: 10px;
-    padding: 5px;
+    padding: 8px; /* Increased padding */
     border: none;
-    border-radius: 4px;
+    border-radius: 8px; /* Match other radii */
     font-size: 14px;
     color: var(--primary-text-color);
-    background-color: var(--input-bg-color);
+    background-color: var(--background-color); /* Better contrast */
 }
 
 .message-input:focus {
-    outline: none;
-    border: 1px solid var(--primary-color);
+    outline: 2px solid var(--primary-color); /* Better accessibility */
+    border: none;
 }
 
 .message-icon {
     font-size: 20px;
     cursor: pointer;
-    color: var(--icon-color);
+    color: var(--primary-color); /* Consistent with attachment icon */
 }
 
-/* files content tooltip */
-
+/* Files content tooltip */
 .file-icons {
     display: flex;
     flex-direction: column;
@@ -59,38 +57,26 @@
     display: flex;
     align-items: center;
     margin-bottom: 5px;
-    position: relative; /* Needed for absolute positioning of the tooltip */
+    position: relative;
 }
-
-.file-icon .attachment-icon {
-    margin-right: 5px;
-}
-
 
 .file-content-tooltip {
     display: none;
     position: absolute;
-    bottom: 100%; /* Position above the file icon */
-    left: 0;  
-    max-width: 300px;
-    max-height: 500px;
-    background-color: var(--secondary-bg-color);
-    border: 1px solid #ddd;
-    padding: 5px;
-    z-index: 1;
-    overflow: auto; /* Add scroll for overflow content */
-    box-sizing: border-box; /* Ensure padding is included in width/height */
-    margin-bottom: 5px; /* Space between the tooltip and the icon */
+    bottom: 100%;
+    left: 0;
+    max-width: min(300px, 90vw); /* Responsive constraint */
+    max-height: 50vh; /* Viewport-based height */
+    background-color: var(--background-color);
+    border: 1px solid var(--box-shadow-color); /* Theme variable */
+    padding: 8px;
+    z-index: 1000;
+    overflow: auto;
+    box-shadow: var(--box-shadow);
 }
 
 .file-icon:hover .file-content-tooltip {
     display: block;
-}
-
-.message-input {
-    /* Existing styles */
-    overflow: hidden; /* Ensures the textarea doesn't show a scrollbar */
-    resize: none; /* Prevent manual resizing */
 }
 
 .message-icon.loading {
@@ -103,11 +89,11 @@
 }
 
 .delete-file-icon {
-    color: #f44336; /* Red color for delete action */
-    margin-left: 10px; /* Space from the file name */
+    color: var(--error-color); /* New theme variable suggested */
+    margin-left: 10px;
     cursor: pointer;
 }
 
 .delete-file-icon:hover {
-    color: #d32f2f; /* Darker red on hover */
+    opacity: 0.8; /* Better than color change */
 }

@@ -1,34 +1,54 @@
 /* App.css */
-
 /* Root variables for light theme */
 :root {
-  --primary-text-color: #333;
+  --primary-text-color: #333333; /* Dark gray for better readability */
   --background-color: #ffffff; /* White background for light mode */
-  --primary-color-hover: #5a8dbb; /* Adjust as needed */
+  --box-shadow-color: rgba(0, 0, 0, 0.1); /* Subtle shadow for light mode */
+  --primary-color-hover: #3a7ca5; /* Slightly darker for hover state */
   --primary-color: #4a76a8; /* Primary color for light mode */
-  --icon-color: #FFF; /* Light theme icon color */
-  --input-bg-color: #ffffff; /* Light theme input background color */
+  --icon-color: #4a76a8; /* Icon color matching primary color */
+  --input-bg-color: #f5f5f5; /* Light gray for input background */
   --button-gradient: linear-gradient(135deg, #ff9f43, #ff6b6b); /* Gradient for buttons */
   --button-gradient-hover: linear-gradient(135deg, #ff6b6b, #ff9f43); /* Gradient for button hover */
   --run-button-gradient: linear-gradient(135deg, #00b894, #00cec9); /* Gradient for run button */
   --google-button-gradient: linear-gradient(135deg, #4285f4, #34a853); /* Gradient for Google button */
   --box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Box shadow for cards and buttons */
+
+  --error-color: #f44336; /* Red color for errors */
+  --warning-color: #ff9800; /* Orange color for warnings */
+  --info-color: #2196f3; /* Blue color for info messages */
+  --secondary-bg-color: #f5f5f5; /* Light mode secondary background */
+
+  --user-prompt-bg: #d0e7ff; /* Light blue */
+  --user-prompt-color: #003366; /* Darker blue for contrast */
+  --user-prompt-border: #aac8ff; /* Subtle border */
 }
 
 /* Dark theme variables */
 [data-theme="dark"] {
-  --primary-text-color: #FFF;
-  --background-color: #000000; /* Black background for dark mode */
-  --primary-color-hover: #4b6a82; /* Adjust as needed */
-  --primary-color: #3674a2; /* Adjusted primary color for dark mode */
-  --icon-color: #ff6b6b; /* Dark theme icon color (red instead of blue) */
-  --input-bg-color: #333; /* Dark theme input background color */
+  --primary-text-color: #f5f5f5; /* Light gray for better readability */
+  --background-color: #1a1a1a; /* Dark background for dark mode */
+  --box-shadow-color: rgba(255, 255, 255, 0.1); /* Subtle shadow for dark mode */
+  --primary-color-hover: #5a8dbb; /* Slightly lighter for hover state */
+  --primary-color: #012551; /* Primary color for dark mode */
+  --icon-color: #f1dfdf; /* Red icon color for contrast */
+  --input-bg-color: #333333; /* Dark gray for input background */
   --button-gradient: linear-gradient(135deg, #ff6b6b, #ff9f43); /* Gradient for buttons */
   --button-gradient-hover: linear-gradient(135deg, #ff9f43, #ff6b6b); /* Gradient for button hover */
   --run-button-gradient: linear-gradient(135deg, #00cec9, #00b894); /* Gradient for run button */
   --google-button-gradient: linear-gradient(135deg, #34a853, #4285f4); /* Gradient for Google button */
   --box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1); /* Box shadow for cards and buttons */
+
+  --error-color: #d32f2f; /* Red color for errors */
+  --warning-color: #ffb74d; /* Orange color for warnings */
+  --info-color: #64b5f6; /* Blue color for info messages */
+  --secondary-bg-color: #2a2a2a;
+
+  --user-prompt-bg: #1e293b; /* Dark blue-gray */
+  --user-prompt-color: #003366; /* Soft blue for contrast */
+  --user-prompt-border: #3b82f6; /* Bright blue border */
 }
+
 
 /* General Body Styles */
 body {

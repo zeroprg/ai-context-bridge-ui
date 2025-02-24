@@ -74,7 +74,7 @@ export const UserProviderComponent: React.FC<PropsWithChildren<{}>> = ({ childre
       if (token) {
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       }
-      getUserInfo(); // Fetch user info when the component mounts
+      getUserInfo(); // Fetch user info when the component mounts    
     }
   }, []);
 

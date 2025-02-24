@@ -1,198 +1,239 @@
-import React, { useEffect, useState, useRef } from 'react';
-import ReactDOM from 'react-dom';
-
+import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { jsPDF } from 'jspdf';
-import { getDocument, PDFDocumentProxy} from 'pdfjs-dist';
-import html2canvas from 'html2canvas'; 
-
+import html2canvas from 'html2canvas';
+import Prism from 'prismjs';
+import 'prismjs/components/prism-java';
+import 'prismjs/components/prism-c';
+import 'prismjs/components/prism-cpp';
+import 'prismjs/components/prism-csharp';
+import 'prismjs/components/prism-go';
+import 'prismjs/components/prism-python';
+import 'prismjs/components/prism-javascript';
+import 'prismjs/components/prism-css';
+import 'prismjs/components/prism-markup';
+import 'prismjs/themes/prism.css';
 import './CopyableCodeBlock.css';
-import FileIcon from '../utils/FileIconProps';
 
-import { PdfToTextConverter } from "../utils/PdfToTextConverter";
+const LANGUAGE_STYLES = {
+  python: { background: '#f8f8f8', color: '#3572A5', icon: '🐍' },
+  javascript: { background: '#f0f8ff', color: '#f1e05a', icon: '📜' },
+  html: { background: '#fff3e6', color: '#e34c26', icon: '🖹' },
+  css: { background: '#e6f3ff', color: '#2965f1', icon: '🎨' },
+  java: { background: '#f3f3f3', color: '#5382a1', icon: '☕' },
+  c: { background: '#555555', color: '#ffffff', icon: '🅒' },
+  cpp: { background: '#f34b7d', color: '#ffffff', icon: '🅒🅟🅟' },
+  csharp: { background: '#239120', color: '#ffffff', icon: '🅒#' },
+  go: { background: '#00ADD8', color: '#ffffff', icon: 'g' },
+  code: { background: '#ffffff', color: '#333333', icon: '📄' },
+  default: { background: '#ffffff', color: '#333333', icon: '📄' },
+};
+
+type LanguageKey = keyof typeof LANGUAGE_STYLES;
 
 interface CopyableCodeBlockProps {
-    children: any;
+  children: React.ReactNode;
+  language?: LanguageKey;
 }
 
-const CopyableCodeBlock: React.FC<CopyableCodeBlockProps> = ({ children }) => {
-    const [buttonLabel, setButtonLabel] = useState('Copy to Clipboard');
+function getLanguageFromFirstWord(content: string): LanguageKey {
+  const [firstWord] = content.trim().split(/\s+/);
+  const lowerWord = firstWord?.toLowerCase() || '';
+  return lowerWord in LANGUAGE_STYLES ? (lowerWord as LanguageKey) : 'default';
+}
 
-    const [isEditing, setIsEditing] = useState(false);
-    const [content, setContent] = useState(children as any);
-    const contentRef = useRef<HTMLDivElement>(null);
-    const canvasRef = useRef<HTMLCanvasElement>(null);
-    const [isCanvasPopulated, setIsCanvasPopulated] = useState(false);
+function removeFirstLineIfLang(content: string, detectedLang: LanguageKey) {
+  if (detectedLang === 'default') return content;
+  const lines = content.split('\n');
+  const firstWord = lines[0].trim().split(/\s+/)[0]?.toLowerCase() || '';
+  if (firstWord === detectedLang) {
+    return lines.slice(1).join('\n').trimStart();
+  }
+  return content;
+}
 
-    const handleMouseEnterPdfIcon = () => {
-        setIsCanvasPopulated(true); // Show canvas when mouse enters the PDF icon        
-    };
+const CopyableCodeBlock: React.FC<CopyableCodeBlockProps> = React.memo(({ children, language }) => {
+  const [isCopied, setIsCopied] = useState(false);
+  const [pdfPreview, setPdfPreview] = useState<string | null>(null);
+  const [isCodeView, setIsCodeView] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const preRef = useRef<HTMLPreElement>(null);
+  const timeoutRef = useRef<NodeJS.Timeout>();
+  const canvasContainerRef = useRef(document.createElement('div'));
 
-    const handleMouseLeaveCanvas = () => {
-        if (isCanvasPopulated) {
-            setIsCanvasPopulated(false); // Hide canvas when mouse leaves
-        }
-    };
-
- 
-const convertToPDF = async (content: any): Promise<PDFDocumentProxy> => {
-    const doc = new jsPDF();
-    try {
-        if (React.isValidElement(content) ||  isHtmlContent(content) ) {
-            const canvas = await renderContentToCanvas(content);
-            const imageData = canvas.toDataURL('image/png');
-            const aspectRatio = canvas.width / canvas.height;
-            const maxWidth = 195;
-            const maxHeight = maxWidth / aspectRatio;
-
-            doc.addImage(imageData, 'PNG', 10, 10, maxWidth, maxHeight);
-        } else {
-            // Handle plain text content
-            doc.text(String(content), 10, 10);
-        }
-
-        const pdfBlob = doc.output('blob');
-        const arrayBuffer = await pdfBlob.arrayBuffer();
-        return getDocument({ data: arrayBuffer }).promise;
-    } catch (error) {
-        console.error('Error generating PDF:', error);
-        throw error;
+  const detectedLang = useMemo<LanguageKey>(() => {
+    if (language) return language;
+    if (typeof children === 'string') {
+      return getLanguageFromFirstWord(children);
     }
-};
+    return 'default';
+  }, [children, language]);
 
-const isHtmlContent = (content:string) => /<(table|div)>[\s\S]*<\/\1>/.test(content.trim());
+  const displayedCode = useMemo(() => {
+    if (typeof children !== 'string') return children;
+    return removeFirstLineIfLang(children, detectedLang);
+  }, [children, detectedLang]);
 
-const renderContentToCanvas = async (content: any) => {
-    const container = document.createElement('div');
-    setupContainer(container);
-    if (React.isValidElement(content)) ReactDOM.render(<>{content}</>, container);
-    else if (isHtmlContent(content)) container.innerHTML = content;
-    
-    document.body.appendChild(container);
-    await new Promise(resolve => setTimeout(resolve, 1000)); // Adjust delay as needed
+  useEffect(() => {
+    if (preRef.current) {
+      Prism.highlightElement(preRef.current);
+    }
+  }, [displayedCode, detectedLang, isCodeView]);
 
-    const canvas = await html2canvas(container, { logging: true, useCORS: true });
-    cleanUp(container);
-    return canvas;
-};
+  const copyToClipboard = useCallback(async () => {
+    if (!contentRef.current) return;
+    const text = typeof displayedCode === 'string' ? displayedCode : contentRef.current.textContent || '';
+    try {
+      await navigator.clipboard.writeText(text);
+      setIsCopied(true);
+      timeoutRef.current = setTimeout(() => setIsCopied(false), 2000);
+    } catch (error) {
+      console.error('Copy failed:', error);
+    }
+  }, [displayedCode]);
 
-const setupContainer = (container:any) => {
+  const generatePDF = useCallback(async () => {
+    if (!contentRef.current) return;
+    const container = canvasContainerRef.current;
     container.style.position = 'absolute';
     container.style.left = '-9999px';
-    container.style.width = '100%';
-};
+    document.body.appendChild(container);
 
-const cleanUp = (container:any) => {
-    if (container) {
-        ReactDOM.unmountComponentAtNode(container);
-        document.body.removeChild(container);
+    try {
+      const canvas = await html2canvas(contentRef.current);
+      const pdf = new jsPDF();
+      const imgData = canvas.toDataURL('image/png');
+      const ratio = canvas.width / canvas.height;
+
+      pdf.addImage(imgData, 'PNG', 10, 10, 190, 190 / ratio);
+      setPdfPreview(URL.createObjectURL(pdf.output('blob')));
+    } catch (error) {
+      console.error('PDF generation failed:', error);
     }
-};
-    // Handler for converting and rendering PDF
-    const handleConvertToPDF = async () => {
-        setIsCanvasPopulated(false);
-        try {
-            const pdf = await convertToPDF(content);
-             
-            await renderPDFToCanvas(pdf);
-        } catch (error) {
-            console.error("Error in converting/rendering PDF: ", error);
-        }
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      if (pdfPreview) URL.revokeObjectURL(pdfPreview);
     };
+  }, [pdfPreview]);
 
-    // Function to render the PDF onto the canvas    
-    const renderPDFToCanvas = async (pdf: PDFDocumentProxy): Promise<void> => {
-        const imageSources = await PdfToTextConverter.convertBatchOfPdfToImages(pdf, 1, 1); // Assuming only first page
-        PdfToTextConverter.renderImageOnCanvas(imageSources, canvasRef)
-            .then(image => {
-                // Use the loaded and rendered Image object here
+  const isDefault = detectedLang === 'default';
+  const langStyle = detectedLang === 'html' && !isCodeView
+    ? LANGUAGE_STYLES.html
+    : LANGUAGE_STYLES[detectedLang];
 
-            })
-            .catch(error => {
-            });
-            // Set canvas populated state to true after rendering
-            setIsCanvasPopulated(true);
-    };
-
-    const toggleEdit = () => {
-        setIsEditing(edit => !edit);
-    };
-
-    useEffect(() => {
-        if (isEditing && contentRef.current) {
-            contentRef.current.focus();
-        }
-    }, [isEditing]);
-
-    const copyToClipboard = () => {
-        if (contentRef.current) {
-            const textToCopy = contentRef.current.innerText;
-            navigator.clipboard.writeText(textToCopy).then(() => {
-                setButtonLabel('Copied');
-                setTimeout(() => setButtonLabel('Copy to Clipboard'), 3000); // Reset label after 3 seconds
-            }).catch(err => {
-                console.error("Failed to copy text: ", err);
-            });
-        }
-    };
-
-
-    const convertToDocx = () => {
-        console.log('Convert to DOCX:', content);
-        // Implement DOCX conversion logic
-    };
-
-    const convertToXlsx = () => {
-        console.log('Convert to XLSX:', content);
-        // Implement XLSX conversion logic
-    };
-
-
-    const renderContent = () => {
-        if (typeof children === 'string') {
-            // If children is a string, use dangerouslySetInnerHTML
-            return <div 
-                     ref={contentRef} 
-                     className="code-style"
-                     contentEditable={isEditing}
-                     onDoubleClick={toggleEdit}
-                     onBlur={() => setIsEditing(false)}
-                     onInput={e => setContent(e.currentTarget.textContent || '')}
-                     dangerouslySetInnerHTML={{ __html: children }}
-                   />;
-        } else {
-            // If children is not a string, render it directly
-            return <div 
-                     ref={contentRef} 
-                     className="code-style"
-                     contentEditable={isEditing}
-                     onDoubleClick={toggleEdit}
-                     onBlur={() => setIsEditing(false)}
-                     onInput={e => setContent(e.currentTarget.textContent || '')}
-                   >
-                     {children}
-                   </div>;
-        }
-    };
-
-
+  const renderContent = useCallback(() => {
+    if (detectedLang === 'html') {
+      return isCodeView ? (
+        <pre ref={preRef} className="language-html">
+          {displayedCode}
+        </pre>
+      ) : (
+        <div dangerouslySetInnerHTML={{ __html: displayedCode as string }} />
+      );
+    }
     return (
-        <div className="code-container">
-            {renderContent()}
-            <canvas 
-                ref={canvasRef} 
-                className={`pdf-canvas ${isCanvasPopulated ? '' : 'hide-canvas'}`}
-                onMouseLeave={handleMouseLeaveCanvas}>
-
-            </canvas>
-            <div className='copy-icon-container'>
-
-                <span className="convert-icon" onClick={copyToClipboard} title={buttonLabel}><FileIcon fileName="*.copy" /></span>
-                <span className="convert-icon" onClick={handleConvertToPDF} title="Convert to PDF"><FileIcon fileName="*.pdf" /></span>
-                <span className="convert-icon" onClick={convertToDocx} title="Convert to DOCX"><FileIcon fileName="*.docx" /></span>
-                <span className="convert-icon" onClick={convertToXlsx} title="Convert to XLSX"><FileIcon fileName="*.xlsx" /></span>
-            </div>
-        </div>
+      <pre ref={preRef} className={`language-${detectedLang}`}>
+        {displayedCode}
+      </pre>
     );
-};
+  }, [detectedLang, displayedCode, isCodeView]);
+
+  const toggleButtonStyle = {
+    backgroundColor: '#eee',
+    color: '#333',
+    padding: '0.3rem 0.6rem',
+    borderRadius: '999px',
+    fontWeight: 'bold',
+    fontSize: '0.85rem',
+    cursor: 'pointer',
+  };
+
+  return (
+    <div className="code-container" style={{ background: langStyle.background }}>
+      <div
+        className="badge-bar"
+        style={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 10,
+          padding: '0.4rem 0.6rem',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          background: langStyle.background,
+        }}
+      >
+        {!isDefault && (
+          <span
+            className="badge"
+            style={{
+              backgroundColor: langStyle.color,
+              color: '#fff',
+              padding: '0.3rem 0.6rem',
+              borderRadius: '999px',
+              fontWeight: 'bold',
+              fontSize: '0.85rem',
+            }}
+          >
+            {langStyle.icon} {detectedLang.toUpperCase()}
+          </span>
+        )}
+
+        <div className="badge-actions" style={{ display: 'flex', gap: '0.4rem' }}>
+          {detectedLang === 'html' && (
+            <span
+              className="badge clickable"
+              onClick={() => setIsCodeView(!isCodeView)}
+              style={toggleButtonStyle}
+            >
+              {isCodeView ? 'Show HTML' : 'Show Code'}
+            </span>
+          )}
+          <span
+            className={`badge clickable ${isCopied ? 'copied' : ''}`}
+            onClick={copyToClipboard}
+            style={toggleButtonStyle}
+          >
+            {isCopied ? '✓ Copied' : 'Copy'}
+          </span>
+          <span
+            className="badge clickable"
+            onClick={generatePDF}
+            style={toggleButtonStyle}
+          >
+            PDF
+          </span>
+        </div>
+      </div>
+
+      <div
+        ref={contentRef}
+        className="code-content"
+        style={{
+          color: langStyle.color,
+          borderLeft: isDefault ? '4px solid #ccc' : `4px solid ${langStyle.color}`,
+        }}
+      >
+        {renderContent()}
+      </div>
+
+      {pdfPreview && (
+        <iframe
+          title="PDF preview"
+          src={pdfPreview}
+          className="pdf-preview"
+        />
+      )}
+
+      {createPortal(
+        <div ref={canvasContainerRef} className="pdf-canvas-container" />,
+        document.body
+      )}
+    </div>
+  );
+});
 
 export default CopyableCodeBlock;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { FaPaypal } from 'react-icons/fa'; // Import icons
 import axios from 'axios';

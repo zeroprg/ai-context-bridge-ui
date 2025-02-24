@@ -1,5 +1,5 @@
 // Home.js
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { getCookie } from './auth';
@@ -17,9 +17,17 @@ const Home = ({ initiateGoogleOAuth }) => {
     const navigate = useNavigate();
     const aboutLink = process.env.REACT_APP_DEV_DOC_SITE || 'http://tothemoon.chat';
 
+    const API_PAGE_PATH = '/api';
+
     const handleRunButtonClick = () => {
-        navigate('/api');
+        navigate(API_PAGE_PATH);
     };
+
+    useEffect(() => {
+        if (getCookie('sessionId')) {
+          navigate(API_PAGE_PATH);
+        }
+      }, [navigate]);
 
     const translateContent = (contentKey) => {
         const translations = {

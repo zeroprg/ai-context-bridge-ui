@@ -22,10 +22,11 @@ const AudioTranscription: React.FC<AudioTranscriptionProps> = ({ onTranscription
   const checkIntervalRef = useRef<number | null>(null);
   const silenceTimeoutRef = useRef<number | null>(null);
   const lastLoudTimeRef = useRef<number>(0);
-  const isProcessingRef = useRef(false); // Add processing lock
+  const isProcessingRef = useRef(false);
+  const hasValidAudioRef = useRef(false); // Track if any valid audio was detected
 
   // Configuration
-  const SILENCE_THRESHOLD = 10;
+  const SILENCE_THRESHOLD = 0.01; // For Float32 audio data (-1 to 1)
   const MIN_AUDIO_DURATION = 0.5;
   const DEBOUNCE_TIME = 500;
 
@@ -59,6 +60,7 @@ const AudioTranscription: React.FC<AudioTranscriptionProps> = ({ onTranscription
   const initializeRecorder = useCallback(async () => {
     cleanupResources();
     isProcessingRef.current = false;
+    hasValidAudioRef.current = false; // Reset valid audio flag
     
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -77,7 +79,6 @@ const AudioTranscription: React.FC<AudioTranscriptionProps> = ({ onTranscription
           audioChunks.current.push(event.data);
         }
 
-        // Only process when recorder is inactive
         if (mediaRecorder.current?.state === 'inactive' && !isProcessingRef.current) {
           isProcessingRef.current = true;
           const shouldSend = await validateAudioDuration();
@@ -98,7 +99,6 @@ const AudioTranscription: React.FC<AudioTranscriptionProps> = ({ onTranscription
       mediaRecorder.current.start();
       lastLoudTimeRef.current = Date.now();
 
-      // Start audio monitoring
       checkIntervalRef.current = window.setInterval(analyzeAudio, 100);
     } catch (error) {
       handleError(`Microphone error: ${error}`);
@@ -106,18 +106,16 @@ const AudioTranscription: React.FC<AudioTranscriptionProps> = ({ onTranscription
   }, [mimeType, handleError, cleanupResources]);
 
   const analyzeAudio = useCallback(() => {
-    if (!analyserRef.current) return;
+    if (!analyserRef.current || !audioContextRef.current) return;
 
-    const dataArray = new Uint8Array(analyserRef.current.fftSize);
-    analyserRef.current.getByteTimeDomainData(dataArray);
-
-    let max = 0;
-    for (let i = 0; i < dataArray.length; i++) {
-      const value = Math.abs(dataArray[i] - 128);
-      if (value > max) max = value;
-    }
+    const floatBuffer = new Float32Array(analyserRef.current.fftSize);
+    analyserRef.current.getFloatTimeDomainData(floatBuffer);
+    
+    // Calculate maximum volume
+    const max = Math.max(...floatBuffer.map(Math.abs));
 
     if (max > SILENCE_THRESHOLD) {
+      hasValidAudioRef.current = true; // Mark valid audio detected
       lastLoudTimeRef.current = Date.now();
       if (silenceTimeoutRef.current) {
         clearTimeout(silenceTimeoutRef.current);
@@ -153,7 +151,9 @@ const AudioTranscription: React.FC<AudioTranscriptionProps> = ({ onTranscription
           resolve(0);
         });
       });
-      return duration >= MIN_AUDIO_DURATION;
+
+      // Check both duration and presence of valid audio
+      return duration >= MIN_AUDIO_DURATION && hasValidAudioRef.current;
     } catch {
       return false;
     }
@@ -174,6 +174,7 @@ const AudioTranscription: React.FC<AudioTranscriptionProps> = ({ onTranscription
     }
   }, [serverUrl, onTranscription, handleError, mimeType]);
 
+  // Rest of the component remains the same
   const startRecording = useCallback(() => {
     setIsRecording(true);
     isRecordingRef.current = true;

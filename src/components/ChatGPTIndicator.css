@@ -4,7 +4,7 @@
     top: 0;          /* Positioned at the top of the viewport */
     left: 0;         /* Positioned at the left of the viewport */
     background-color:var(--secondary-bg-color);; /* Dark background */
-    color: var(--icon-color);    /* White text, assuming from the image */
+    color: red;   
     padding: 0.5em 1em; /* Some padding around the text */
     z-index: 1000;   /* Ensure it sits on top of other elements */
     font-size: 16px; /* Font size similar to the image */
